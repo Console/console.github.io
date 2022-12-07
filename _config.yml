@@ -20,8 +20,8 @@
 
 title: Console Blog
 email: Scriptmonkey.blog@gmail.com
-description: >- # this means to ignore newlines until "baseurl:"
-This is a description of the site, woo! look how awesome it is.
+description: >- # this means to ignore newlines until "baseurl:"  
+  This is a description of the site, woo! look how awesome it is.
 baseurl: "/" # the subpath of your site, e.g. /blog
 url: "https://console.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: scriptmonkey_
