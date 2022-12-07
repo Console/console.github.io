@@ -18,10 +18,11 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Console Blog
+title: Scriptmonkey_'s Blog
 email: Scriptmonkey.blog@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"  
-  This is a description of the site, woo! look how awesome it is.
+  Blog is currently undergoing construction. See about page for info.
+  Posts will be migrated across from an older website [https://blog.scriptmonkey.eu]
 baseurl: "/" # the subpath of your site, e.g. /blog
 url: "https://console.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: scriptmonkey_
