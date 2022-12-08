@@ -27,6 +27,13 @@ baseurl: "/" # the subpath of your site, e.g. /blog
 url: "https://console.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: scriptmonkey_
 github_username:  console
+mastodon:
+- username: scriptmonkey_
+  instance: infosec.exchange
+
+author: Scriptmonkey_
+
+logo: /assets/logo-50px.png
 
 # Build settings
 # Removed minima theme as it is now a regular theme.
