@@ -23,7 +23,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   Blog is currently undergoing construction. See about page for info.
   Posts will be migrated across from an older website https://blog.scriptmonkey.eu
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://console.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://blog.scriptmonkey.uk" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: scriptmonkey_
 github_username:  console
 mastodon:
