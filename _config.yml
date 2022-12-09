@@ -31,6 +31,7 @@ mastodon:
   instance: infosec.exchange
 author: Scriptmonkey_
 logo: /assets/logo-50px.png
+rss: RSS Feed
 # Constrain excerpt to first sentence
 excerpt_separator: .
 # Build settings
