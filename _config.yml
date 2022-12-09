@@ -17,7 +17,6 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-
 title: Scriptmonkey_'s Blog
 email: Scriptmonkey.blog@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"  
@@ -30,20 +29,15 @@ github_username:  console
 mastodon:
 - username: scriptmonkey_
   instance: infosec.exchange
-
 author: Scriptmonkey_
-
 logo: /assets/logo-50px.png
-
 # Constrain excerpt to first sentence
 excerpt_separator: .
-
 # Build settings
 # Removed minima theme as it is now a regular theme.
 # theme: minima
 plugins:
   - jekyll-feed
-
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
