@@ -35,6 +35,9 @@ author: Scriptmonkey_
 
 logo: /assets/logo-50px.png
 
+# Constrain excerpt to first sentence
+excerpt_separator: .
+
 # Build settings
 # Removed minima theme as it is now a regular theme.
 # theme: minima

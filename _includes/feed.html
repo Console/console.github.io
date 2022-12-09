@@ -1,0 +1,35 @@
+<section class="{{sectionName}}">
+    {%- assign feedPosts = site.posts | where: 'categories', feedType -%}
+    {%- for post in feedPosts offset: displayOffset limit: displayLimit -%}
+    <div class="feed-card">
+        <div class="card-image">
+            {%- assign postImage = post.image | relative_url -%}
+            {%- if postImage -%}
+                <img src="{{postImage}}" alt="" class="featured-image">
+            {%- else -%}
+                {% assign placeholder_image_file = site.static_files
+                    | where_exp: "file", "file.name contains 'placeholder_hack'"
+                    | sample
+                %}
+                {%- assign postImage = placeholder_image_file.path -%}
+                <img src="{{postImage | relative_url}}" alt="" class="featured-image">        
+            {%- endif -%}
+        </div>
+        <div class="card-content">
+            <div class="card-title">
+                {%- assign postTitle = post.title | escape -%}
+                {%- assign postURL = post.url | relative_url -%}
+                <span class="title"><a href="{{postURL}}" class="post-link">{{postTitle}}</a></span>
+            </div>
+            <div class="excerpt">
+                {%- assign postExcerpt = post.excerpt | strip_html | escape -%}
+                <span class="excerpt">{{postExcerpt}}</span>
+            </div>
+            <div class="card-date">
+                {%- assign postDate = post.date | date: "%Y/%m/%d" -%}
+                <span class="date">{{postDate}}</span>
+            </div>
+        </div>
+    </div>
+    {%- endfor -%}
+</section>
