@@ -1,0 +1,8 @@
+---
+layout: post
+title:  "Post 3!"
+date:   2022-12-07 13:51:00 +0000
+categories: blog
+image: /assets/images/placeholder_hack3.jpg
+---
+This is post 3.

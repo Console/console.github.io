@@ -35,6 +35,12 @@ author: Scriptmonkey_
 
 logo: /assets/logo-50px.png
 
+defaults:
+  - scope:
+      path: "assets/images"
+    values:
+      image: true
+
 # Build settings
 # Removed minima theme as it is now a regular theme.
 # theme: minima
