@@ -1,8 +1,0 @@
----
-layout: post
-title:  "Post 1!"
-date:   2022-12-07 11:00:00 +0000
-categories: blog
-image: /assets/images/placeholder_hack1.jpg
----
-This is post 1.
