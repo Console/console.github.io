@@ -4,7 +4,7 @@ title:  "My First CTF  - PlaidCTF 2012"
 date:   2012-05-04 00:00:00 +0000
 categories: blog
 ---
-So it was the same as any other usual Friday, 10pm I’m shattered after a particularly taxing week at work so laying in bed reading a book (the rock and roll lifestyle of a social pariah) when I get a text from a colleague
+So it was the same as any other usual Friday, 10pm I’m shattered after a particularly taxing week at work so laying in bed reading a book (the rock and roll lifestyle of a social pariah) when I get a text from a colleague.
 
 > Dude, what are you doing this weekend? I’m just about to take part in a CTF, get online #corelan on freenode
 
