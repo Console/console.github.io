@@ -121,7 +121,7 @@ No good, they all bomb out. I’ve not got any time left and the CTF ends withou
 
 I’m gutted but have learned a hell of a lot over the weekend. Exhausted I call it quits for the night and head to get my beauty sleep.
 
-Post Event
+## Post Event
 
 I learned that on the editors question, I was so close to the answer it was ridiculous. I failed not because I was doing something wrong, but because the challenge was insufficiently deterministic. It was incredibly difficult to predict the conditions in which the challenge was created and as such only 20 teams passed that particular challenge, I think i’m one person who tried the most on it as well (spent pretty much all my time on it including installing the various OSes).
 
@@ -132,7 +132,5 @@ Alternatively just loading it up in a modern copy of VLC media player would let 
 Still despite the close failures, I learned so much especially at the hands of the guys in the corelan team and it was incredibly enjoyable. Going to try and keep in contact with the #corelan folk and get involved next time there is one.
 
 Fingers crossed I get to practice my binary exploitation before the next one. Defcon 20 prequals here we come :laughing:
-
-##################
 
 Apologies for not including the code and screenshots I wanted to include in the above post. Just a case of writing this and not having access to them on this laptop.
