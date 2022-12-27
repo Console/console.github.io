@@ -83,7 +83,7 @@ Meanwhile I get back onto the editors problem and try a few more things and get 
 
 /sbin/poweroff, if you run it in run level 6 without any arguments it’ll reboot the machine, meaning the final state of it will be “on”. However in run level 3 without any arguments it will shutdown the machine, meaning the final state will be off.
 
-Assuming that it could be either may be throwing me off so I refresh the installs of all the above, fire up a bash process watcher (watch ‘ps -ef | grep bash | grep -v grep | wc -l’) in each of them, and try the script in all.
+Assuming that it could be either; I refresh the installs of all the above and fire up a bash process watcher ```watch ‘ps -ef | grep bash | grep -v grep | wc -l’``` in each of them, and try the script in all.
 
 I come out with 2 answers, 1 with the state on and 1 with the state off. I submit both types of keys – no good.
 
