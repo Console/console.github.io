@@ -5,9 +5,9 @@ date:   2012-06-22 00:00:00 +0000
 categories: blog
 image: /assets/images/2012-06-22-GPP-Expanded-1.png
 ---
-Cross posting some work of a friend of mine that I was helping with, I say “helping” in the lightest form of the word (I had a domain controller ready to test, he didn’t).
+Cross posting some work of a friend of mine that I was helping with, I say “helping” in the lightest form of the word. (I had a domain controller ready to test, he didn’t).
 
-Meatballs (over at: http://rewtdance.blogspot.com) has been doing some work attempting to put together a metasploit module to decrypt passwords found within the sysvol folder on win2k8 domains.
+Meatballs over at: [](http://rewtdance.blogspot.com) has been doing some work attempting to put together a metasploit module to decrypt passwords found within the sysvol folder on win2k8 domains.
 
 However rather than just settle for the disclosed “local users and groups are vulnerable…” he dug a little deeper after realising that datasources and other such things that have user credentials associated with them were also stored in the same manner.
 
