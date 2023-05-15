@@ -37,12 +37,11 @@ else:
 i = 0;
 while i < iterations:
     i +=1
-    service = Service(executable_path="/mnt/hackshare/creation/webby/chrome/chromedriver");
     options = Options();
     options.add_argument("--headless=new");
     options.add_argument("--disable-dev-shm-usage");
     options.add_argument("--no-sandbox");
-    driver = webdriver.Chrome(options=options,service=service)
+    driver = webdriver.Remote("http://localhost:4444/wd/hub",options=options)
     try:
         driver.get(url.replace("*",str(i)));
         driver.find_element_by_name("email").send_keys("the_plague@ellingsonmineralcorporation.net");
