@@ -55,8 +55,9 @@ while i < iterations:
         print(f"{bcolors.OKCYAN}==={bcolors.ENDC}");
         driver.close();
         driver.quit();
-    except:
-        print(f"{bcolors.FAIL}[!]{bcolors.ENDC} - " + url.replace("*",str(i)))
+    except Exception as e:
+        print(f"{bcolors.FAIL}[!]{bcolors.ENDC} - " + url.replace("*",str(i)));
+        print(e);
         driver.close();
         driver.quit();
 
