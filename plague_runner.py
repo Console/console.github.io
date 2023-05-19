@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#docker run -d -p 4444:4444 -v /dev/shm:/dev/shm selenium/standalone-chrome
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
