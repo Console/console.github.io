@@ -1,0 +1,96 @@
+---
+layout: post
+title:  "BSides London 2013: Blinking Hell - Extracting data using keyboard lock states"
+date:   2013-04-25 00:00:00 +0000
+categories: blog
+image: /assets/images/2013-04-25-Bsides-London-2013-1.jpg
+---
+So hopefully if you’re reading this you’ve seen mine and Matt Phillips ([@phillips321](https://www.twitter.com/phillips321)) talk about Blinking Hell in the Rookie Stream at BSides London 2013.
+
+![](/assets/images/2013-04-25-Bsides-London-2013-1.jpg)
+
+Photo of [@phillips321](https://www.twitter.com/phillips321) and [@ScriptMonkey_](https://www.twitter.com/ScriptMonkey_) presenting Blinking Hell, courtesy of @Andrew_Barratt
+
+What follows is a more in-depth blog post I hope that contains some of the timeline and reasoning around some of the things we did and why we did them.
+
+For those of you who are fresh to this and don’t know what Blinking Hell is, it’s a sysadmin/security dude’s worst nightmare. It’s someone bypassing all your host based protections and extracting your crown jewels without leaving too visible a trace.
+
+## What is Blinking Hell?
+Blinking Hell makes use of a small arduino like programmable USB device. The Teensy, created by Paul J Stoffregen as a small programmable USB device it seems to be able to emulate any USB device under the sun and is used in various projects including converting real flight controls into computer flight simulator input, repairing dance pads or maybe you’ve heard or used one with the Social Engineering Toolkit, courtesy of the research and work put in by IronGeek and David Kennedy. It allowed a new way of wrapping payloads onto a device that could type extremely fast.
+
+People soon turned their teensy’s into FTP/HTTP/Etc network clients of awesome, plugging in and exporting data left right and centre. Fantastic! But, what if you don’t have internet access?
+
+What if the system you’re trying to get data off of is not allowed to browse the internet willy nilly? What if you didn’t need the internet?
+
+## Okay, but then i’d just use a USB Drive like normal…
+Nope, not in this case. In this case they’ve prevented write access to USB drives using host based endpoint protection mechanisms. Heck in some cases you can’t even get the USB device to be recognised as plugged in thanks to things like Lumension Endpoint Security (aka Sanctuary) for example.
+
+Drat… you say, YAY! I say.
+
+Challenge accepted.
+
+## How do you do it?
+So the basic premise.
+
+1. Write some code that does something that magically transports data off of the disk.
+
+2. Get the teensy to inject code, or supply the code via other means (other employee internally emailing it?, bring it through import/export procedures).
+
+3. Now you’ve injected the code, run it.
+
+4. Knowing where the crown jewels are stored
+
+5. Saving it to disk
+
+6. Exfiltration of data.
+
+## So, How do you get data off of a system, you can’t get data from?
+This boils down to what ways can the teensy see data?
+
+My colleague way back in 2010, managed to get to go on a nice trip to Defcon and saw a lovely talk by the aforementioned David Kennedy, he was also perfectly placed to grab a free teensy when he threw a few out to the crowd at the end of his speech.
+
+My colleague managed to also have a quick chat during which he asked if the teensy could be used for output in the keyboard configuration and David said something along the lines of “I don’t see how it could, its just a keyboard”.
+
+My colleague is a determined person and left thinking “there must be a way”. A few weeks/months of research and he stumbled upon a bit of documentation regarding PS2 keyboards and their control lines. This documentation noted that the “lock state” LEDs were “broadcast” signals that would be seen by any PS2 devices plugged into the host. Does the same hold true for USB?
+
+Well in his blog post back in August 2011, he revealed it: <http://www.phillips321.co.uk/2011/08/25/teensy-keyboardlockkeys/>
+
+Back then I was just a lowly software coding monkey on another project, in the same company but not within the penetration testing field, however as of September 1st 2011 I got accepted into the penetration testing team and started getting to know the team. This is when Matt revealed his research project above to me. Having done a bit of hacky development work I thought I could contribute and so volunteered my services. I didn’t get much done until one night in October 2011.
+
+## Eureka!
+I had spent all evening working on it, until finally at 10 past midnight on the 25th of October 2011 I published a video to my facebook pages confusing my friends except the few that understood what I had achieved.
+
+I had gone from Text file -> Bytes -> Binary Bit Stream -> Signalled using keyboard Lockstates -> Saved internally on the Teensy’s SD Card (or eeprom depending on the implementation I used).
+
+If I knew how to export it elsewhere and host it somewhere I would. It was rough but it was ready and it worked.
+
+Then I left it…. Me and Matt talked about dedicating some time to polishing it but conferences came and went and we were both too nervous to stand in front of an audience and do a long talk about it. Then came September 2012.
+
+B Sides London 2013 Call for papers and introducing a new Rookie Track, 15 minute talks in front of a small audience with an experienced mentor to guide you. It seemed perfect. We wrote up a small abstract in a canteen over lunch and submitted our talk.
+
+## Disaster!… (almost)
+November 2012 we had notification we had been accepted and then came a bombshell in the form of a “WTF?!?” message over facebook from Matt. He sent me a link to hack-a-day.
+
+<http://hackaday.com/2012/10/30/extracting-data-with-keyboard-emulation/>
+
+Someone had “published”.
+
+But they had a flaw, they used custom executable code. That just won’t fly on our systems I don’t want to have to run an executable. I want it to work across locked down systems that use whitelists for these things so we used macros. Something I’m pretty familiar with having been working on a local lockdown project for a fair while now. You can find some of the things I’ve done with macros over at: <https://blog.scriptmonkey.uk/blog/2012/07/12/nftf-local-lockdown.html>
+
+Long story short, We still had our talk! 🙂 *phew!*
+
+So now without further waffling, we get to the important stuff.
+
+Rough edit of our presentation video with slides: BSides London 2013 Rookie Track Presentation – Blinking Hell
+
+The code to get this working on your own teensy can be found here: <https://www.assembla.com/code/blinking-hell/git/nodes>
+
+My colleague has uploaded the in-talk video at: <https://www.youtube.com/watch?v=N8nyt4ugTnE>
+
+I’ve uploaded an earlier video that we made with older code, but it shows more of the debugging output and juicy techie stuff: <http://www.youtube.com/watch?v=a_O0eBFShaY>
+
+Apologies for the poor attempt at narrating it but figured I’d best explain some aspects of it.
+
+~~Whenever we get the whole presentation video we plan on sharing that too!~~ See above for the presentation video 😉
+
+I hope you enjoyed our talk and I can hand on heart say it was enjoyable to do and hearing the feedback in the breakout room afterwards some of the suggestions made were interesting, watch this space you may see some of those interesting developments soon(ish).
