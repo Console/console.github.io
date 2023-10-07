@@ -41,6 +41,7 @@ Using ‘gpedit.msc’ as an administrator, navigate to the following root and e
 With that setting enabled and a user created. Log out of your administrator account, log back in as the user under test.
 Open Internet Explorer and view internet settings, navigate to the connections tab and view the Lan Settings. It should appear as per the screenshot below.
 ![](/assets/images/2013-09-12-bypass-proxy-settings-1.png)
+
 *Checkbox is populated, Policy is enforced*
 You will be unable to change the “Automatically Detect Settings” Tick box.
 
@@ -50,12 +51,14 @@ Alter the registry key/value of:
 ``` HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections\DefaultConnectionSettings ```
 
 ![](/assets/images/2013-09-12-bypass-proxy-settings-2.png)
+
 *Changing the registry key*
 
 Edit it so that the 09 becomes 01, or rather subtract 8h from the 9th byte of this value.
 Now reload up Internet Explorer and view the Lan Settings once again.
 
 ![](/assets/images/2013-09-12-bypass-proxy-settings-3.png)
+
 *Checkbox no longer populated*
 
 Voila, Policy is still applied but settings have just been edited by yourself.
