@@ -3,7 +3,7 @@ layout: post
 title:  "Bypassing Group Policy Proxy Settings using the Windows Registry"
 date:   2013-09-12 00:00:00 +0000
 categories: blog
-image: /assets/images/2013-09-12-bypass-proxy-settings-1.png
+image: /assets/images/2013-09-12-bypass-proxy-settings-2.png
 ---
 
 ## Foreword: Irresponsible Disclosure?
