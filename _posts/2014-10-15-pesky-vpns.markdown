@@ -3,7 +3,7 @@ layout: post
 title:  "PeSKy VPNs - A lesson in IPSEC and IKEv1"
 date:   2014-10-15 00:00:00 +0000
 categories: blog
-images: /assets/images/2014-10-15-pesky-vpns-6.png
+image: /assets/images/2014-10-15-pesky-vpns-6.png
 ---
 ## Introduction
 So every quarter my company arranges an internal “conference” where the members of my team have to come up with some sort of presentation discussing research or learning that they have done in the past 3 months.
