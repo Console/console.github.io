@@ -5,7 +5,7 @@ date:   2018-09-13 00:00:00 +0000
 categories: blog
 image: /assets/images/2018-09-03-emfctf-writeup-10.png
 ---
-So it's come around once again, EMFCamp is an event held every 2 years somewhere in the UK (usually south of England as far as i'm aware) where people from all walks of life come together to celebrate anything that's geeky/nerdy or just plain cool!
+So it's come around once again, EMFCamp is an event held every 2 years somewhere in the UK (usually south of England as far as i'm aware) where people from all walks of life come together to celebrate anything that's geeky/nerdy or just plain cool!.
 
 If you get to go, expect LEDs, Lasers, algorithmically/AI generated techno music, retro gaming consoles. Cool vehicles, crazy constructions, human hacking, blacksmithing, clothes making, recycling t-shirts into cushions... you name it, it's probably available at the camp. It takes place over a 4 day period (arrive Friday, leave Monday) and is welcoming to all.
 
