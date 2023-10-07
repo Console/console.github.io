@@ -9,7 +9,7 @@ So hopefully if you’re reading this you’ve seen mine and Matt Phillips ([@ph
 
 ![](/assets/images/2013-04-25-BSides-London-2013-1.jpg)
 
-Photo of [@phillips321](https://www.twitter.com/phillips321) and [@ScriptMonkey_](https://www.twitter.com/ScriptMonkey_) presenting Blinking Hell, courtesy of @Andrew_Barratt
+Photo of [@phillips321](https://www.twitter.com/phillips321) and [@ScriptMonkey_](https://www.twitter.com/ScriptMonkey_) presenting Blinking Hell, courtesy of [@Andrew_Barratt](https://www.twitter.com/Andrew_Barratt) 
 
 What follows is a more in-depth blog post I hope that contains some of the timeline and reasoning around some of the things we did and why we did them.
 
