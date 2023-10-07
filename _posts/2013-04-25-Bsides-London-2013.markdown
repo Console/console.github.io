@@ -3,11 +3,11 @@ layout: post
 title:  "BSides London 2013: Blinking Hell - Extracting data using keyboard lock states"
 date:   2013-04-25 00:00:00 +0000
 categories: blog
-image: /assets/images/2013-04-25-Bsides-London-2013-1.jpg
+image: /assets/images/2013-04-25-BSides-London-2013-1.jpg
 ---
 So hopefully if you’re reading this you’ve seen mine and Matt Phillips ([@phillips321](https://www.twitter.com/phillips321)) talk about Blinking Hell in the Rookie Stream at BSides London 2013.
 
-![](/assets/images/2013-04-25-Bsides-London-2013-1.jpg)
+![](/assets/images/2013-04-25-BSides-London-2013-1.jpg)
 
 Photo of [@phillips321](https://www.twitter.com/phillips321) and [@ScriptMonkey_](https://www.twitter.com/ScriptMonkey_) presenting Blinking Hell, courtesy of @Andrew_Barratt
 
