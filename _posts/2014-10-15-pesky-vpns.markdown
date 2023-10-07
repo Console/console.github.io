@@ -3,6 +3,7 @@ layout: post
 title:  "PeSKy VPNs - A lesson in IPSEC and IKEv1"
 date:   2014-10-15 00:00:00 +0000
 categories: blog
+images: /assets/images/2014-10-15-pesky-vpns-6.png
 ---
 ## Introduction
 So every quarter my company arranges an internal “conference” where the members of my team have to come up with some sort of presentation discussing research or learning that they have done in the past 3 months.
@@ -25,11 +26,13 @@ IPSEC VPNs traditionally run on UDP port 500. The use of UDP is an important fac
 So send the wrong stuff and you could end up seeing:
 
 ![](/assets/images/2014-10-15-pesky-vpns-1.png)
+
 *VPN where are you?*
 
 That outcome appears to be either a special configuration or due to a particular vendor’s implementation. I have seen it in the wild but traditionally this happens:
 
 ![](/assets/images/2014-10-15-pesky-vpns-2.png)
+
 *Ah… there you are VPN, but why won’t you shake my hand?*
 
 I receive a notify message. Notify in the world of IPSEC VPNs tends to mean (at least in my research) one of two things.
@@ -145,6 +148,7 @@ So we move onto method 2 of enumerating group ID’s…
 Prior to 2010 – Only a valid Group ID would return a dead peer detection header. This is also known as [CSCtj96108](http://www.cisco.com/en/US/products/csr/cisco-sr-20101124-vpn-grpname.html) and would result in this contrasting output in ike-scan.
 
 ![](/assets/images/2014-10-15-pesky-vpns-3.png)
+
 *Well that’s a Dead (peer detection) GIveaway 😉*
 
 Some tools support this in particular the spiderlabs chaps have a few scripts available at their [github](https://github.com/SpiderLabs/groupenum) that do this detection when given a dictionary of words to brute force.
@@ -154,6 +158,7 @@ Additionally the enterprising chaps at portcullis have “[iker](https://labs.po
 However, this was patched 4 years ago, by making EVERY request return a DPD entry.
 
 ![](/assets/images/2014-10-15-pesky-vpns-4.png)
+
 *Drat! now dead peers are popping up everywhere!*
 
 Additionally as it was 4 years ago, that’s plenty of time for hardware refreshes and actual patches/firmware updates to be applied. As your (and mine) mileage may vary with this one we move onto the latest way for enumerating group ID’s.
@@ -163,6 +168,7 @@ I have to thank Spiderlabs for all of this as essentially this is their baby, i�
 After the 2010 patching of DPD, a person far more intelligent than me decided to see what else might be different between a valid and invalid VPN response and during his research discovered that there were differing packet counts depending on the validity of the Group ID sent.
 
 ![](/assets/images/2014-10-15-pesky-vpns-5.png)
+
 *Are you right? Please be right? Seriously? Are you not the correct ID? aww fine I give up talking to you.*
 
 In the case of a valid ID 2 responses would be expected. In the case of an invalid ID, 6 responses would return over a longer period of time (almost as if the service tries incredibly hard to resolve the bad ID).
@@ -179,7 +185,9 @@ If I were a master coder of python (or actually did the Python E-Learning packag
 
 ## Semi-Summary
 In my opinion i’ve pretty much discounted using IKE-SCAN as a valid tool for finding VPNs and will in future be making more use of Portcullis IKER.
+
 ![](/assets/images/2014-10-15-pesky-vpns-6.png)
+
 *Automated CVSSv2 Scoring too!*
 
 Purely because it’s a tool that appears to test a large number more transforms than I believed were present than ike-scan and it automates group ID bruteforcing if you provide it a dictionary using at the very least the first two methods discussed and may in fact make use of the third.
@@ -204,6 +212,7 @@ Using the details you have discovered so far and some arp-spoofing or Wifi pinea
 The client would blindly send their credentials believing that they are connecting to the right VPN endpoint (no certificate checking with XAUTH), et voila! You have captured their creds in the clear.
 
 ![](/assets/images/2014-10-15-pesky-vpns-7.png)
+
 *It’s me! Honest!!!*
 
 So in order to get FIKED to work you have to figure out a way of forwarding the victims traffic through yourself. I achieved this by setting up 2 arp-spoof sessions to capture traffic in both directions between target and their gateway.
