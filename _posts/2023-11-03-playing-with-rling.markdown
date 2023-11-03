@@ -3,13 +3,13 @@ layout: post
 title:  "Playing with RLI-NG"
 date:   2023-11-03 19:35:00 +0000
 categories: blog
-image: /assets/images/2023-12-03-playing-with-rling-1.png
+image: /assets/images/2023-11-03-playing-with-rling-1.png
 ---
 A while ago I gave a bit of a haphazard [presentation](https://www.youtube.com/watch?v=-mh3-Z6bScc) on the art of password cracking at Steelcon in 2022. Having not needed to crack passwords in anger recently; I had completely forgotten about the quirks of understanding some of the more esoteric tools when it comes to managing your wordlists.
 
 Well it raised it's head again recently in a discord server i'm in and whilst I knew the tool for the job that was being asked, I could not for the life of me understand the outputs I got when trying to come up with the right command for the person to run, so to mitigate this happening again in future I present to you: *How the F... Do I use RLI-NG?!*
 
-The Premise
+### The Premise
 > You have become aware of a new wordlist doing the rounds, or have painstakingly curated one of your own, but you're concerned about duplication of effort, as surely every wordlist has the word "password" in it.
 >
 >You don't want to waste GPU cycles burning time mutating that for the 27 dictionaries I'm running on this job. So you want to only add new words to your collection of wordlists.
@@ -27,7 +27,7 @@ rling.exe new-dict.txt new-words.txt weakpass.txt rockyou.txt breachcompilation.
 
 You can now delete new-dict.txt and import new-words.txt into your list of dictionaries.
 
-Simple right?
+### Simple right?
 
 What if you want one wordlist to rule them all? So you could do it manually filtering out dictionaries from other dictionaries using the above command, or you go all in - concatenate everything.
 
@@ -36,7 +36,7 @@ c:\> gc rockyou.txt,weakpass.txt,breachcompilation.txt,new-dict.txt |sc mega-wor
 c:\> rli-ng.exe mega-words.txt new-mega-words.txt
 # wait a while
 ```
-![](/assets/images/2023-12-03-playing-with-rling-1.png "If one wants a deduplicated list - one must be patient")
+![](/assets/images/2023-11-03-playing-with-rling-1.png "If one wants a deduplicated list - one must be patient")
 
 *you can also save the file directly back to itself, just big files are a pain to download if it messes up :)*
 
