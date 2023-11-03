@@ -22,8 +22,8 @@ To use it:
 rling.exe new-dict.txt new-words.txt weakpass.txt rockyou.txt breachcompilation.txt
 ```
 
-* New-dict.txt - being the dictionary you wish to add to your collection.
-* New-Words.txt - being the output of words you do not have elsewhere, but contained within the new dictionary.
+* new-dict.txt - being the dictionary you wish to add to your collection.
+* new-Words.txt - being the output of words you do not have elsewhere, but contained within the new dictionary.
 
 You can now delete new-dict.txt and import new-words.txt into your list of dictionaries.
 
@@ -40,4 +40,4 @@ c:\> rli-ng.exe mega-words.txt new-mega-words.txt
 
 *you can also save the file directly back to itself, just big files are a pain to download if it messes up :)*
 
-Boom - you now have a mega wordlist, no duplicate words featured within. Be sure to record what wordlists you've concatenated together though in case you later need to add to it.
+Boom! You now have a mega wordlist, no duplicate words featured within. Be sure to record what wordlists you've concatenated together though in case you later need to add to it.
