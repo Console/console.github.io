@@ -7,6 +7,8 @@ window.onload = function() {
     let analyser;
     let microphone;
     let gainNode;
+    let isListening = false;
+    let streamReference;
     const targetFrequency = 440; // A4 note, for example
     const frequencyThreshold = 5; // Frequency range within target
     let frequencySum = 0;
@@ -30,19 +32,37 @@ window.onload = function() {
                 gainControl.oninput = function() {
                     gainNode.gain.value = this.value;
                 };
-
-                // Ask for microphone access
-                navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
-                    microphone = audioContext.createMediaStreamSource(stream);
-                    microphone.connect(gainNode);
-                    gainNode.connect(analyser);
-                    analyzeSound();
-                }).catch(function(error) {
-                    alert('Error accessing the microphone: ' + error.message);
-                });
             } catch (error) {
                 alert('Web Audio API not supported by your browser');
+                return;
             }
+        }
+
+        if (!isListening) {
+            // Ask for microphone access
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+                streamReference = stream;
+                microphone = audioContext.createMediaStreamSource(stream);
+                microphone.connect(gainNode);
+                gainNode.connect(analyser);
+                analyzeSound();
+                startButton.textContent = "Stop Listening";
+                isListening = true;
+            }).catch(function(error) {
+                alert('Error accessing the microphone: ' + error.message);
+            });
+        } else {
+            // Disconnect the microphone and stop the stream
+            if (microphone) {
+                microphone.disconnect();
+                gainNode.disconnect();
+                if (streamReference) {
+                    let tracks = streamReference.getTracks();
+                    tracks.forEach(track => track.stop());
+                }
+            }
+            startButton.textContent = "Start Listening";
+            isListening = false;
         }
     });
 
@@ -51,6 +71,7 @@ window.onload = function() {
         const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 
         function update() {
+            if (!isListening) return;
             analyser.getByteTimeDomainData(dataArray);
 
             // Calculate the frequency
