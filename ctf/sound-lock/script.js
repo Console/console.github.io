@@ -27,25 +27,13 @@ window.onload = function() {
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
-            try {
-                audioContext = new AudioContext();
-                analyser = audioContext.createAnalyser();
-                analyser.fftSize = 4096;
-                gainNode = audioContext.createGain();
-                gainNode.gain.value = gainControl.value;
-
-                bandPassFilter = audioContext.createBiquadFilter();
-                bandPassFilter.type = 'bandpass';
-                updateBandPassFilter();
-
-                gainControl.oninput = function() {
-                    gainNode.gain.value = this.value;
-                };
-                lowFreq.oninput = highFreq.oninput = updateBandPassFilter;
-            } catch (error) {
-                alert('Web Audio API not supported by your browser');
-                return;
-            }
+            audioContext = new AudioContext();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 4096;
+            gainNode = audioContext.createGain();
+            bandPassFilter = audioContext.createBiquadFilter();
+            bandPassFilter.type = 'bandpass';
+            updateBandPassFilter();
         }
 
         if (!isListening) {
@@ -71,16 +59,13 @@ window.onload = function() {
             microphone.disconnect();
             gainNode.disconnect();
             bandPassFilter.disconnect();
-            if (streamReference) {
-                let tracks = streamReference.getTracks();
-                tracks.forEach(track => track.stop());
-            }
+            streamReference.getTracks().forEach(track => track.stop());
         }
         startButton.textContent = "Start Listening";
         isListening = false;
         matchStartTime = null;
         clearInterval(countdownTimer);
-        matchDisplay.textContent = "Status: 🔴"; // Red emoji for no match
+        matchDisplay.textContent = "Status: 🔴";
     }
 
     function analyzeSound() {
@@ -88,7 +73,10 @@ window.onload = function() {
         const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 
         function update() {
-            if (!isListening) return;
+            if (!isListening) {
+                clearInterval(countdownTimer);
+                return;
+            }
             analyser.getByteTimeDomainData(dataArray);
             const frequency = findFrequency(dataArray, audioContext.sampleRate);
 
@@ -104,7 +92,7 @@ window.onload = function() {
                         countdownTimer = setInterval(function() {
                             updateCountdown(matchStartTime, parseInt(targetDuration.value));
                         }, 100);
-                        matchDisplay.textContent = "Status: 🟡"; // Yellow emoji during countdown
+                        matchDisplay.textContent = "Status: 🟡";
                     }
                 } else {
                     stopListening();
@@ -126,8 +114,15 @@ window.onload = function() {
             matchDisplay.textContent = `Status: 🟡 - ${timeLeft.toFixed(1)}s remaining`;
         } else {
             clearInterval(countdownTimer);
-            matchDisplay.textContent = "Status: 🟢"; // Green emoji for match with duration met
+            matchDisplay.textContent = "Status: 🟢";
         }
+    }
+
+    function updateBandPassFilter() {
+        const lowValue = parseInt(lowFreq.value);
+        const highValue = parseInt(highFreq.value);
+        bandPassFilter.frequency.value = (lowValue + highValue) / 2;
+        bandPassFilter.Q.value = bandPassFilter.frequency.value / (highValue - lowValue);
     }
 
     function findFrequency(dataArray, sampleRate) {
@@ -147,12 +142,5 @@ window.onload = function() {
             return sampleRate / avgPeriod;
         }
         return 0; // Return 0 if no frequency found
-    }
-
-    function updateBandPassFilter() {
-        const lowValue = parseInt(lowFreq.value);
-        const highValue = parseInt(highFreq.value);
-        bandPassFilter.frequency.value = (lowValue + highValue) / 2;
-        bandPassFilter.Q.value = bandPassFilter.frequency.value / (highValue - lowValue);
     }
 };
