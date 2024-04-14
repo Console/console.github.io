@@ -95,9 +95,9 @@ window.onload = function() {
     function analyzeSound() {
         const dataArray = new Uint8Array(analyser.fftSize);
         const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
-        const movingAverageSize = 10;  // Number of samples to average
+        const movingAverageSize = 20;  // Number of samples to average
         const recentFrequencies = [];  // Buffer to store recent frequency values
-        const debounceDelay = 100;  // Delay in milliseconds
+        const debounceDelay = 200;  // Delay in milliseconds
         let lastDebounceTime = 0;
     
         function update() {
