@@ -7,7 +7,7 @@ window.onload = function() {
     const highFreq = document.getElementById('highFreq'); // Upper bound for bandpass filter
     const targetDuration = document.getElementById('targetDuration');
     const targetFrequency = 440; // Target frequency for matching
-    const tolerance = 5; // Tolerance for frequency matching
+    const tolerance = 20; // Tolerance for frequency matching
     let audioContext;
     let analyser;
     let microphone;
