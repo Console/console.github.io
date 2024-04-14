@@ -5,7 +5,7 @@ window.onload = function() {
     const gainControl = document.getElementById('gain');
     const lowFreq = document.getElementById('lowFreq');
     const highFreq = document.getElementById('highFreq');
-    const targetDuration = document.getElementById('targetDuration'); // Input for user-defined duration
+    const targetDuration = document.getElementById('targetDuration');
     let audioContext;
     let analyser;
     let microphone;
@@ -15,23 +15,21 @@ window.onload = function() {
     let streamReference;
     let frequencySum = 0;
     let frequencyCount = 0;
-    const updateInterval = 500; // Debounce interval in ms
-    let lastUpdateTime = 0;
-    let startTime = 0; // To track the duration of frequency match
-    let isMatched = false;
+    let matchStartTime = null; // Store the start time when a match is found
+    let countdownTimer = null;
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
             try {
                 audioContext = new AudioContext();
                 analyser = audioContext.createAnalyser();
-                analyser.fftSize = 4096; // Increased FFT size
+                analyser.fftSize = 4096;
                 gainNode = audioContext.createGain();
                 gainNode.gain.value = gainControl.value;
 
                 bandPassFilter = audioContext.createBiquadFilter();
                 bandPassFilter.type = 'bandpass';
-                updateBandPassFilter(); // Update filter settings based on initial input values
+                updateBandPassFilter();
 
                 gainControl.oninput = function() {
                     gainNode.gain.value = this.value;
@@ -68,6 +66,9 @@ window.onload = function() {
             }
             startButton.textContent = "Start Listening";
             isListening = false;
+            matchStartTime = null; // Reset match start time
+            clearInterval(countdownTimer); // Clear the countdown timer if running
+            matchDisplay.innerText = "Match: No";
         }
     });
 
@@ -86,31 +87,34 @@ window.onload = function() {
             }
 
             const now = Date.now();
-            if (now - lastUpdateTime > updateInterval) {
-                const averageFrequency = frequencySum / frequencyCount;
-                frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
+            const averageFrequency = frequencySum / frequencyCount;
+            frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
 
-                const lowValue = parseInt(lowFreq.value);
-                const highValue = parseInt(highFreq.value);
-                if (averageFrequency >= lowValue && averageFrequency <= highValue) {
-                    if (!isMatched) {
-                        startTime = now; // Start timing
-                        isMatched = true;
-                    } else if (now - startTime >= (parseInt(targetDuration.value) * 1000)) {
-                        matchDisplay.innerText = "Match: Yes, duration met";
-                    } else {
-                        matchDisplay.innerText = "Match: Yes";
-                    }
-                } else {
-                    matchDisplay.innerText = "Match: No";
-                    isMatched = false;
+            const lowValue = parseInt(lowFreq.value);
+            const highValue = parseInt(highFreq.value);
+            if (averageFrequency >= lowValue && averageFrequency <= highValue) {
+                if (!matchStartTime) {
+                    matchStartTime = now; // Start the timer
+                    // Start countdown timer
+                    countdownTimer = setInterval(function() {
+                        const timePassed = (Date.now() - matchStartTime) / 1000;
+                        const timeLeft = parseInt(targetDuration.value) - timePassed;
+                        if (timeLeft > 0) {
+                            matchDisplay.innerText = `Match: Yes, ${timeLeft.toFixed(1)}s until duration met`;
+                        } else {
+                            matchDisplay.innerText = "Match: Yes, duration met";
+                            clearInterval(countdownTimer); // Clear countdown timer when duration is met
+                        }
+                    }, 100); // Update every 100 ms for smooth countdown
                 }
-                // Reset for next average calculation
-                frequencySum = 0;
-                frequencyCount = 0;
-                lastUpdateTime = now;
+            } else {
+                matchDisplay.innerText = "Match: No";
+                matchStartTime = null; // Reset the timer
+                clearInterval(countdownTimer); // Clear the countdown timer
             }
 
+            frequencySum = 0;
+            frequencyCount = 0;
             requestAnimationFrame(update);
         }
 
