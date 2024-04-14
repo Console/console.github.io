@@ -3,9 +3,11 @@ window.onload = function() {
     const frequencyDisplay = document.getElementById('frequency');
     const matchDisplay = document.getElementById('matchDisplay');
     const gainControl = document.getElementById('gain');
-    const lowFreq = document.getElementById('lowFreq');
-    const highFreq = document.getElementById('highFreq');
+    const lowFreq = document.getElementById('lowFreq'); // Lower bound for bandpass filter
+    const highFreq = document.getElementById('highFreq'); // Upper bound for bandpass filter
     const targetDuration = document.getElementById('targetDuration');
+    const targetFrequency = 440; // Target frequency for matching
+    const tolerance = 5; // Tolerance for frequency matching
     let audioContext;
     let analyser;
     let microphone;
@@ -55,10 +57,7 @@ window.onload = function() {
             microphone.disconnect();
             gainNode.disconnect();
             bandPassFilter.disconnect();
-            if (streamReference) {
-                let tracks = streamReference.getTracks();
-                tracks.forEach(track => track.stop());
-            }
+            streamReference.getTracks().forEach(track => track.stop());
         }
         startButton.textContent = "Start Listening";
         isListening = false;
@@ -77,12 +76,10 @@ window.onload = function() {
             const frequency = findFrequency(dataArray, audioContext.sampleRate);
 
             if (frequency !== 0) {
-                const averageFrequency = frequency;
-                frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
+                frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz`;
 
-                const lowValue = parseInt(lowFreq.value);
-                const highValue = parseInt(highFreq.value);
-                if (averageFrequency >= lowValue && averageFrequency <= highValue) {
+                // Check if the detected frequency is within the target frequency range plus/minus the tolerance
+                if (Math.abs(frequency - targetFrequency) <= tolerance) {
                     if (!matchStartTime) {
                         matchStartTime = Date.now();
                         countdownTimer = setInterval(function() {
