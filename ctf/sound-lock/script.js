@@ -1,12 +1,3 @@
-document.getElementById('configBtn').addEventListener('click', function() {
-    var panel = document.getElementById('configPanel');
-    if (panel.style.display === 'none') {
-        panel.style.display = 'block';
-    } else {
-        panel.style.display = 'none';
-    }
-});
-
 window.onload = function() {
     const startButton = document.getElementById('start');
     const frequencyDisplay = document.getElementById('frequency');
@@ -24,6 +15,11 @@ window.onload = function() {
     let streamReference;
     let matchStartTime = null;
     let countdownTimer = null;
+
+    document.getElementById('configBtn').addEventListener('click', function() {
+        var panel = document.getElementById('configPanel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    });
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
@@ -59,13 +55,16 @@ window.onload = function() {
             microphone.disconnect();
             gainNode.disconnect();
             bandPassFilter.disconnect();
-            streamReference.getTracks().forEach(track => track.stop());
+            if (streamReference) {
+                let tracks = streamReference.getTracks();
+                tracks.forEach(track => track.stop());
+            }
         }
         startButton.textContent = "Start Listening";
         isListening = false;
         matchStartTime = null;
         clearInterval(countdownTimer);
-        matchDisplay.textContent = "Status: 🔴";
+        matchDisplay.innerText = "Match: No";
     }
 
     function analyzeSound() {
@@ -73,10 +72,7 @@ window.onload = function() {
         const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 
         function update() {
-            if (!isListening) {
-                clearInterval(countdownTimer);
-                return;
-            }
+            if (!isListening) return;
             analyser.getByteTimeDomainData(dataArray);
             const frequency = findFrequency(dataArray, audioContext.sampleRate);
 
@@ -92,10 +88,12 @@ window.onload = function() {
                         countdownTimer = setInterval(function() {
                             updateCountdown(matchStartTime, parseInt(targetDuration.value));
                         }, 100);
-                        matchDisplay.textContent = "Status: 🟡";
+                        matchDisplay.innerText = "Match: Yes";
                     }
                 } else {
-                    stopListening();
+                    matchDisplay.innerText = "Match: No";
+                    matchStartTime = null;
+                    clearInterval(countdownTimer);
                 }
             }
 
@@ -111,10 +109,10 @@ window.onload = function() {
         const timeLeft = targetDuration - elapsed;
 
         if (timeLeft > 0) {
-            matchDisplay.textContent = `Status: 🟡 - ${timeLeft.toFixed(1)}s remaining`;
+            matchDisplay.innerText = `Match: Yes, ${timeLeft.toFixed(1)}s remaining`;
         } else {
             clearInterval(countdownTimer);
-            matchDisplay.textContent = "Status: 🟢";
+            matchDisplay.innerText = "Match: Yes, duration met";
         }
     }
 
