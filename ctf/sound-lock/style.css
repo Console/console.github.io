@@ -28,8 +28,19 @@ button:hover {
 }
 
 #resetButton {
-    background-color: red;
+    background-color: darkred;
 }
+
+.button-stop {
+    background-color: red; /* Red background for the stop button */
+    color: white; /* White text to contrast the red background */
+}
+
+/* Optional: hover effects */
+.button-stop:hover {
+    background-color: darkred; /* Darker red on hover */
+}
+
 
 input[type="range"],
 input[type="number"] {
