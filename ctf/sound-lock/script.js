@@ -8,6 +8,9 @@ window.onload = function() {
     const targetDuration = document.getElementById('targetDuration');
     const targetFrequency = 440; // Target frequency for matching
     const tolerance = 20; // Tolerance for frequency matching
+    const movingAverageBuffer = [];
+    const movingAverageSize = 10; // Number of samples to average
+
     let audioContext;
     let analyser;
     let microphone;
