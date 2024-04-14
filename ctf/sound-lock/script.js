@@ -9,26 +9,19 @@ window.onload = function() {
     let gainNode;
     let isListening = false;
     let streamReference;
-    const targetFrequency = 440; // A4 note, for example
-    const frequencyThreshold = 5; // Frequency range within target
-    let frequencySum = 0;
-    let frequencyCount = 0;
+    let frequencies = []; // Array to keep the last N frequencies
+    const numAverages = 10; // Number of averages for moving average calculation
+    const updateInterval = 500; // Update frequency display every 500ms
+    let lastUpdateTime = 0;
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
             try {
-                // Initialize the Audio Context
                 audioContext = new AudioContext();
-
-                // Setup the Analyzer
                 analyser = audioContext.createAnalyser();
-                analyser.fftSize = 2048;
-
-                // Create Gain Node
+                analyser.fftSize = 4096; // Increased FFT size for better resolution
                 gainNode = audioContext.createGain();
                 gainNode.gain.value = gainControl.value;
-
-                // Attach event listener to the gain slider
                 gainControl.oninput = function() {
                     gainNode.gain.value = this.value;
                 };
@@ -39,7 +32,6 @@ window.onload = function() {
         }
 
         if (!isListening) {
-            // Ask for microphone access
             navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
                 streamReference = stream;
                 microphone = audioContext.createMediaStreamSource(stream);
@@ -52,7 +44,6 @@ window.onload = function() {
                 alert('Error accessing the microphone: ' + error.message);
             });
         } else {
-            // Disconnect the microphone and stop the stream
             if (microphone) {
                 microphone.disconnect();
                 gainNode.disconnect();
@@ -73,21 +64,18 @@ window.onload = function() {
         function update() {
             if (!isListening) return;
             analyser.getByteTimeDomainData(dataArray);
-
-            // Calculate the frequency
             const frequency = findFrequency(dataArray, audioContext.sampleRate);
-            if (frequency !== 0) {
-                frequencySum += frequency;
-                frequencyCount++;
-            }
-            const averageFrequency = frequencySum / frequencyCount;
-            frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
 
-            // Check if the frequency is within the target range
-            if (Math.abs(averageFrequency - targetFrequency) <= frequencyThreshold) {
-                matchDisplay.innerText = "Match: Yes";
-            } else {
-                matchDisplay.innerText = "Match: No";
+            if (frequency !== 0) {
+                frequencies.push(frequency);
+                if (frequencies.length > numAverages) frequencies.shift(); // Keep only the last N frequencies
+            }
+
+            const now = Date.now();
+            if (now - lastUpdateTime > updateInterval) {
+                const averageFrequency = frequencies.reduce((a, b) => a + b, 0) / frequencies.length;
+                frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
+                lastUpdateTime = now;
             }
 
             requestAnimationFrame(update);
@@ -99,8 +87,6 @@ window.onload = function() {
     function findFrequency(dataArray, sampleRate) {
         let lastCrossing = 0;
         let numCrossings = 0;
-
-        // Find zero-crossings
         for (let i = 1; i < dataArray.length; i++) {
             if ((dataArray[i-1] < 128) && (dataArray[i] >= 128)) {
                 if (lastCrossing > 0) {
@@ -109,7 +95,6 @@ window.onload = function() {
                 lastCrossing = i;
             }
         }
-
         if (numCrossings > 0) {
             const avgPeriod = (lastCrossing / numCrossings);
             return sampleRate / avgPeriod;
