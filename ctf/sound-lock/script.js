@@ -7,7 +7,7 @@ window.onload = function() {
     const challengeCompleteDisplay = document.getElementById('challengeCompleteDisplay');
     const targetFrequencies = [256, 293, 329]; // Array of target frequencies
     const tolerance = 10; // Tolerance for frequency matching
-    const targetDuration = 2000; // Duration in milliseconds
+    const targetDuration = 3000; // Duration in milliseconds
     let audioContext;
     let analyser;
     let microphone;
@@ -131,7 +131,6 @@ window.onload = function() {
                             countdownTimer = setInterval(function() {
                                 updateCountdown(matchStartTime, parseInt(targetDuration), matchDisplay, matchDisplays);
                             }, 100);
-                            matchDisplay.innerText = "🟢 Target Frequency Matched";
                         }
                     } else {
                         matchDisplay.innerText = "🔴 Target Frequency NOT Matched";
