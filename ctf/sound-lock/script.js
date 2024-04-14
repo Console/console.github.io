@@ -8,9 +8,9 @@ window.onload = function() {
     const gainControl = document.getElementById('gain');
     const lowFreq = document.getElementById('lowFreq');
     const highFreq = document.getElementById('highFreq');
-    const targetDuration = document.getElementById('targetDuration');
     const targetFrequencies = [256, 293, 329]; // Array of target frequencies
     const tolerance = 10; // Tolerance for frequency matching
+    const targetDuration = 2000; // Duration in milliseconds
     let audioContext;
     let analyser;
     let microphone;
@@ -34,6 +34,8 @@ window.onload = function() {
             gainNode = audioContext.createGain();
             bandPassFilter = audioContext.createBiquadFilter();
             bandPassFilter.type = 'bandpass';
+            bandPassFilter.frequency.value = 600; // hardcoded center frequency for the bandpass filter
+            bandPassFilter.Q.value = 1.5; // hardcoded Q value for the bandpass filter
             updateBandPassFilter();
         }
 
@@ -135,7 +137,7 @@ window.onload = function() {
                         if (!matchStartTime) {
                             matchStartTime = Date.now();
                             countdownTimer = setInterval(function() {
-                                updateCountdown(matchStartTime, parseInt(targetDuration.value), matchDisplay, matchDisplays);
+                                updateCountdown(matchStartTime, parseInt(targetDuration), matchDisplay, matchDisplays);
                             }, 100);
                             matchDisplay.innerText = "🟢 Target Frequency Matched";
                         }
@@ -157,11 +159,11 @@ window.onload = function() {
 
     function updateCountdown(startTime, targetDuration, matchDisplay, matchDisplays) {
         const now = Date.now();
-        const elapsed = (now - startTime) / 1000;
-        const timeLeft = targetDuration - elapsed;
-
+        const elapsed = (now - startTime) / 1000; // Convert milliseconds to seconds
+        const timeLeft = (targetDuration / 1000) - elapsed; // Calculate remaining time in seconds
+    
         if (timeLeft > 0) {
-            matchDisplay.innerText = `🟡 Target Frequency Matched, ${timeLeft.toFixed(1)}s remaining`;
+            matchDisplay.innerText = `🟡 Target Frequency Matching, ${timeLeft.toFixed(1)}s remaining`;
         } else {
             clearInterval(countdownTimer);
             matchDisplay.innerText = "🟢 Target Frequency Matched, Target Duration Met";
@@ -170,22 +172,20 @@ window.onload = function() {
                 matchDisplays[currentTargetIndex].style.display = "block"; // Show the next target display
                 matchStartTime = null; // Reset start time for the next frequency matching
             } else {
-                // All targets matched, challenge completed
                 matchDisplays.forEach(display => {
-                display.innerText = "🟢 Target Frequency Matched, Target Duration Met"; // Update all displays to show matched
+                    display.innerText = "🟢 Target Frequency Matched, Target Duration Met"; // Update all displays to show matched
                 });
                 challengeCompleteDisplay.innerText = "Challenge Completed";
                 challengeCompleteDisplay.style.display = "block";
-                stopListening(); // Optionally stop listening after all targets are matched
+                stopListening();
             }
         }
     }
+    
 
     function updateBandPassFilter() {
-        const lowValue = parseInt(lowFreq.value);
-        const highValue = parseInt(highFreq.value);
-        bandPassFilter.frequency.value = (lowValue + highValue) / 2;
-        bandPassFilter.Q.value = bandPassFilter.frequency.value / (highValue - lowValue);
+        bandPassFilter.frequency.value = 600; // hardcoded center frequency for the bandpass filter
+        bandPassFilter.Q.value = 1.5; // hardcoded Q value for the bandpass filter
     }
 
     function findFrequency(dataArray, sampleRate) {
