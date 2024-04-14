@@ -108,6 +108,9 @@ window.onload = function() {
             if (frequency !== 0) {
                 frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz`;
 
+                let currentTargetFrequency = targetFrequencies[currentTargetIndex];
+                let matchDisplays = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay];
+                let matchDisplay = matchDisplays[currentTargetIndex];
                 const frequencyDifference = Math.abs(frequency - currentTargetFrequency);
                 document.getElementById('gaugeLabel').innerText = `Difference: ${frequencyDifference.toFixed(2)} Hz`;
 
@@ -115,9 +118,7 @@ window.onload = function() {
                 let gaugePercent = Math.min(frequencyDifference, 100) / 100 * 100;
                 document.getElementById('gauge').style.width = `${gaugePercent}%`;
 
-                let currentTargetFrequency = targetFrequencies[currentTargetIndex];
-                let matchDisplays = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay];
-                let matchDisplay = matchDisplays[currentTargetIndex];
+
 
                 if (Math.abs(frequency - currentTargetFrequency) <= tolerance) {
                     if (!matchStartTime) {
