@@ -111,14 +111,6 @@ window.onload = function() {
                 let currentTargetFrequency = targetFrequencies[currentTargetIndex];
                 let matchDisplays = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay];
                 let matchDisplay = matchDisplays[currentTargetIndex];
-                const frequencyDifference = Math.abs(frequency - currentTargetFrequency);
-                document.getElementById('gaugeLabel').innerText = `Difference: ${frequencyDifference.toFixed(2)} Hz`;
-
-                // Update gauge width based on frequency difference, capped at 100 Hz for full scale
-                let gaugePercent = Math.min(frequencyDifference, 100) / 100 * 100;
-                document.getElementById('gauge').style.width = `${gaugePercent}%`;
-
-
 
                 if (Math.abs(frequency - currentTargetFrequency) <= tolerance) {
                     if (!matchStartTime) {
