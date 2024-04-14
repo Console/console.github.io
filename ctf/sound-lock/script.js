@@ -166,7 +166,7 @@ window.onload = function() {
                 matchDisplays.forEach(display => {
                     display.innerText = "🟢 Target Frequency Matched, Target Duration Met"; // Update all displays to show matched
                 });
-                challengeCompleteDisplay.innerText = "Challenge Completed";
+                challengeCompleteDisplay.innerHTML = "Challenge Completed<br/>flag{Canu_r_Dydd_a_Chanu_r_Nos}";
                 challengeCompleteDisplay.style.display = "block";
                 stopListening();
             }
