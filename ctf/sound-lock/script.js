@@ -41,6 +41,7 @@ window.onload = function() {
                 bandPassFilter.connect(analyser);
                 analyzeSound();
                 startButton.textContent = "Stop Listening";
+                startButton.classList.add('button-stop'); // Change button to red
                 isListening = true;
             }).catch(function(error) {
                 alert('Error accessing the microphone: ' + error.message);
@@ -75,7 +76,7 @@ window.onload = function() {
         if (isListening) {
             stopListening();
         }
-        document.getElementById('start').textContent = "Start Listening"; // Reset start button text
+        document.getElementById('start').textContent = "Start Listening  ▶️"; // Reset start button text
         document.getElementById('frequency').innerText = "Frequency: -- Hz"; // Reset frequency display
     });
     
@@ -88,7 +89,8 @@ window.onload = function() {
         }
         isListening = false;
         clearInterval(countdownTimer);
-        document.getElementById('start').textContent = "Start Listening";
+        document.getElementById('start').textContent = "Start Listening  ▶️";
+        startButton.classList.remove('button-stop'); // Change button back to normal
     }
 
     function analyzeSound() {
