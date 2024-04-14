@@ -5,6 +5,7 @@ window.onload = function() {
     const gainControl = document.getElementById('gain');
     const lowFreq = document.getElementById('lowFreq');
     const highFreq = document.getElementById('highFreq');
+    const targetDuration = document.getElementById('targetDuration'); // Input for user-defined duration
     let audioContext;
     let analyser;
     let microphone;
@@ -16,6 +17,8 @@ window.onload = function() {
     let frequencyCount = 0;
     const updateInterval = 500; // Debounce interval in ms
     let lastUpdateTime = 0;
+    let startTime = 0; // To track the duration of frequency match
+    let isMatched = false;
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
@@ -90,9 +93,17 @@ window.onload = function() {
                 const lowValue = parseInt(lowFreq.value);
                 const highValue = parseInt(highFreq.value);
                 if (averageFrequency >= lowValue && averageFrequency <= highValue) {
-                    matchDisplay.innerText = "Match: Yes";
+                    if (!isMatched) {
+                        startTime = now; // Start timing
+                        isMatched = true;
+                    } else if (now - startTime >= parseInt(targetDuration.value) * 1000) {
+                        matchDisplay.innerText = "Match: Yes, duration met";
+                    } else {
+                        matchDisplay.innerText = "Match: Yes";
+                    }
                 } else {
                     matchDisplay.innerText = "Match: No";
+                    isMatched = false;
                 }
                 // Reset for next average calculation
                 frequencySum = 0;
