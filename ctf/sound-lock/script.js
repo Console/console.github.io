@@ -3,12 +3,13 @@ window.onload = function() {
     const frequencyDisplay = document.getElementById('frequency');
     const firstMatchDisplay = document.getElementById('firstMatchDisplay');
     const secondMatchDisplay = document.getElementById('secondMatchDisplay');
+    const thirdMatchDisplay = document.getElementById('thirdMatchDisplay');
+    const challengeCompleteDisplay = document.getElementById('challengeCompleteDisplay');
     const gainControl = document.getElementById('gain');
     const lowFreq = document.getElementById('lowFreq');
     const highFreq = document.getElementById('highFreq');
     const targetDuration = document.getElementById('targetDuration');
-    const firstTargetFrequency = 440; // First target frequency
-    const secondTargetFrequency = 660; // Second target frequency
+    const targetFrequencies = [440, 660, 880]; // Array of target frequencies
     const tolerance = 20; // Tolerance for frequency matching
     let audioContext;
     let analyser;
@@ -17,9 +18,8 @@ window.onload = function() {
     let bandPassFilter;
     let isListening = false;
     let streamReference;
-    let matchStartTime = null;
+    let currentTargetIndex = 0; // Index to track the current target frequency
     let countdownTimer = null;
-    let secondTargetActive = false; // To track if the second target needs to be matched
 
     document.getElementById('configBtn').addEventListener('click', function() {
         var panel = document.getElementById('configPanel');
@@ -64,10 +64,10 @@ window.onload = function() {
         }
         startButton.textContent = "Start Listening";
         isListening = false;
-        matchStartTime = null;
         clearInterval(countdownTimer);
         firstMatchDisplay.innerText = "First Match: No";
-        secondMatchDisplay.style.display = "none"; // Hide second match display
+        secondMatchDisplay.style.display = "none";
+        thirdMatchDisplay.style.display = "none";
     }
 
     function analyzeSound() {
@@ -82,14 +82,15 @@ window.onload = function() {
             if (frequency !== 0) {
                 frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz`;
 
-                let currentTargetFrequency = secondTargetActive ? secondTargetFrequency : firstTargetFrequency;
-                let matchDisplay = secondTargetActive ? secondMatchDisplay : firstMatchDisplay;
+                let currentTargetFrequency = targetFrequencies[currentTargetIndex];
+                let matchDisplays = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay];
+                let matchDisplay = matchDisplays[currentTargetIndex];
 
                 if (Math.abs(frequency - currentTargetFrequency) <= tolerance) {
                     if (!matchStartTime) {
                         matchStartTime = Date.now();
                         countdownTimer = setInterval(function() {
-                            updateCountdown(matchStartTime, parseInt(targetDuration.value), matchDisplay);
+                            updateCountdown(matchStartTime, parseInt(targetDuration.value), matchDisplay, matchDisplays);
                         }, 100);
                         matchDisplay.innerText = "Match: Yes";
                     }
@@ -106,7 +107,7 @@ window.onload = function() {
         requestAnimationFrame(update);
     }
 
-    function updateCountdown(startTime, targetDuration, matchDisplay) {
+    function updateCountdown(startTime, targetDuration, matchDisplay, matchDisplays) {
         const now = Date.now();
         const elapsed = (now - startTime) / 1000;
         const timeLeft = targetDuration - elapsed;
@@ -116,13 +117,15 @@ window.onload = function() {
         } else {
             clearInterval(countdownTimer);
             matchDisplay.innerText = "Match: Yes, duration met";
-            if (!secondTargetActive) {
-                secondTargetActive = true;
-                secondMatchDisplay.style.display = "block"; // Show second match display
-                matchDisplay.innerText = "First Match: Latched";
+            currentTargetIndex++;
+            if (currentTargetIndex < targetFrequencies.length) {
+                matchDisplays[currentTargetIndex].style.display = "block"; // Show the next target display
+                matchStartTime = null; // Reset start time for the next frequency matching
             } else {
-                stopListening(); // Optionally stop listening after second target is matched
-                secondMatchDisplay.innerText = "Second Match: Latched";
+                // All targets matched, challenge completed
+                challengeCompleteDisplay.innerText = "Challenge Completed";
+                challengeCompleteDisplay.style.display = "block";
+                stopListening(); // Optionally stop listening after all targets are matched
             }
         }
     }
