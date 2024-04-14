@@ -3,14 +3,11 @@ window.onload = function() {
     const frequencyDisplay = document.getElementById('frequency');
     const matchDisplay = document.getElementById('matchDisplay');
     const gainControl = document.getElementById('gain');
-    const lowFreq = document.getElementById('lowFreq'); // Lower bound for bandpass filter
-    const highFreq = document.getElementById('highFreq'); // Upper bound for bandpass filter
+    const lowFreq = document.getElementById('lowFreq');
+    const highFreq = document.getElementById('highFreq');
     const targetDuration = document.getElementById('targetDuration');
-    const targetFrequency = 440; // Target frequency for matching
+    const targetFrequency = 440; // Example target frequency
     const tolerance = 20; // Tolerance for frequency matching
-    const movingAverageBuffer = [];
-    const movingAverageSize = 10; // Number of samples to average
-
     let audioContext;
     let analyser;
     let microphone;
@@ -72,27 +69,16 @@ window.onload = function() {
     function analyzeSound() {
         const dataArray = new Uint8Array(analyser.fftSize);
         const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
-    
+
         function update() {
             if (!isListening) return;
             analyser.getByteTimeDomainData(dataArray);
             const frequency = findFrequency(dataArray, audioContext.sampleRate);
-    
+
             if (frequency !== 0) {
-                // Add the new frequency to the moving average buffer
-                movingAverageBuffer.push(frequency);
-                if (movingAverageBuffer.length > movingAverageSize) {
-                    movingAverageBuffer.shift(); // Remove the oldest frequency value
-                }
-    
-                // Calculate the moving average of frequencies
-                const sum = movingAverageBuffer.reduce((a, b) => a + b, 0);
-                const averageFrequency = sum / movingAverageBuffer.length;
-    
-                frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
-    
-                // Check if the detected average frequency is within the target frequency range plus/minus the tolerance
-                if (Math.abs(averageFrequency - targetFrequency) <= tolerance) {
+                frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz`;
+
+                if (Math.abs(frequency - targetFrequency) <= tolerance) {
                     if (!matchStartTime) {
                         matchStartTime = Date.now();
                         countdownTimer = setInterval(function() {
@@ -106,13 +92,13 @@ window.onload = function() {
                     clearInterval(countdownTimer);
                 }
             }
-    
+
             requestAnimationFrame(update);
         }
-    
+
         requestAnimationFrame(update);
     }
-  
+
     function updateCountdown(startTime, targetDuration) {
         const now = Date.now();
         const elapsed = (now - startTime) / 1000;
@@ -123,6 +109,8 @@ window.onload = function() {
         } else {
             clearInterval(countdownTimer);
             matchDisplay.innerText = "Match: Yes, duration met";
+            stopListening(); // Stop listening once the duration requirement is met
+            matchDisplay.innerText = "Status: Matched"; // Latch the status to "Matched"
         }
     }
 
