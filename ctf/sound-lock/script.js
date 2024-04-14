@@ -1,9 +1,16 @@
 window.onload = function() {
     const startButton = document.getElementById('start');
     const frequencyDisplay = document.getElementById('frequency');
+    const matchDisplay = document.getElementById('match');
+    const gainControl = document.getElementById('gain');
     let audioContext;
     let analyser;
     let microphone;
+    let gainNode;
+    const targetFrequency = 440; // A4 note, for example
+    const frequencyThreshold = 5; // Frequency range within target
+    let frequencySum = 0;
+    let frequencyCount = 0;
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
@@ -13,12 +20,22 @@ window.onload = function() {
 
                 // Setup the Analyzer
                 analyser = audioContext.createAnalyser();
-                analyser.fftSize = 2048; // Change this to more or less, depending on the desired precision
+                analyser.fftSize = 2048;
+
+                // Create Gain Node
+                gainNode = audioContext.createGain();
+                gainNode.gain.value = gainControl.value;
+
+                // Attach event listener to the gain slider
+                gainControl.oninput = function() {
+                    gainNode.gain.value = this.value;
+                };
 
                 // Ask for microphone access
                 navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
                     microphone = audioContext.createMediaStreamSource(stream);
-                    microphone.connect(analyser);
+                    microphone.connect(gainNode);
+                    gainNode.connect(analyser);
                     analyzeSound();
                 }).catch(function(error) {
                     alert('Error accessing the microphone: ' + error.message);
@@ -38,7 +55,19 @@ window.onload = function() {
 
             // Calculate the frequency
             const frequency = findFrequency(dataArray, audioContext.sampleRate);
-            frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz`;
+            if (frequency !== 0) {
+                frequencySum += frequency;
+                frequencyCount++;
+            }
+            const averageFrequency = frequencySum / frequencyCount;
+            frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
+
+            // Check if the frequency is within the target range
+            if (Math.abs(averageFrequency - targetFrequency) <= frequencyThreshold) {
+                matchDisplay.innerText = "Match: Yes";
+            } else {
+                matchDisplay.innerText = "Match: No";
+            }
 
             requestAnimationFrame(update);
         }
