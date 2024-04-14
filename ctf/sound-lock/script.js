@@ -9,7 +9,7 @@ window.onload = function() {
     const lowFreq = document.getElementById('lowFreq');
     const highFreq = document.getElementById('highFreq');
     const targetDuration = document.getElementById('targetDuration');
-    const targetFrequencies = [256, 293, 329]; // Array of target frequencies
+    const targetFrequencies = [261, 293, 329]; // Array of target frequencies
     const tolerance = 10; // Tolerance for frequency matching
     let audioContext;
     let analyser;
@@ -107,13 +107,6 @@ window.onload = function() {
 
             if (frequency !== 0) {
                 frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz`;
-
-                const frequencyDifference = Math.abs(frequency - currentTargetFrequency);
-                document.getElementById('gaugeLabel').innerText = `Difference: ${frequencyDifference.toFixed(2)} Hz`;
-
-                // Update gauge width based on frequency difference, capped at 100 Hz for full scale
-                let gaugePercent = Math.min(frequencyDifference, 100) / 100 * 100;
-                document.getElementById('gauge').style.width = `${gaugePercent}%`;
 
                 let currentTargetFrequency = targetFrequencies[currentTargetIndex];
                 let matchDisplays = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay];
