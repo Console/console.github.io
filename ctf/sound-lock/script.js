@@ -1,3 +1,12 @@
+document.getElementById('configBtn').addEventListener('click', function() {
+    var panel = document.getElementById('configPanel');
+    if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+    } else {
+        panel.style.display = 'none';
+    }
+});
+
 window.onload = function() {
     const startButton = document.getElementById('start');
     const frequencyDisplay = document.getElementById('frequency');
@@ -15,15 +24,6 @@ window.onload = function() {
     let streamReference;
     let matchStartTime = null;
     let countdownTimer = null;
-
-    document.getElementById('configBtn').addEventListener('click', function() {
-        var panel = document.getElementById('configPanel');
-        if (panel.style.display === 'none') {
-            panel.style.display = 'block';
-        } else {
-            panel.style.display = 'none';
-        }
-    })
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
