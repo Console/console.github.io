@@ -5,10 +5,10 @@ window.onload = function() {
     const secondMatchDisplay = document.getElementById('secondMatchDisplay');
     const thirdMatchDisplay = document.getElementById('thirdMatchDisplay');
     const challengeCompleteDisplay = document.getElementById('challengeCompleteDisplay');
-    const gainControl = "1";
-    const lowFreq = "200";
-    const highFreq = "500";
-    const targetDuration = "2";
+    const gainControl = 1;
+    const lowFreq = 200;
+    const highFreq = 500;
+    const targetDuration = 2;
     const targetFrequencies = [261, 293, 329]; // Array of target frequencies
     const tolerance = 10; // Tolerance for frequency matching
     let audioContext;
@@ -115,10 +115,10 @@ window.onload = function() {
                         countdownTimer = setInterval(function() {
                             updateCountdown(matchStartTime, parseInt(targetDuration.value), matchDisplay, matchDisplays);
                         }, 100);
-                        matchDisplay.innerText = "🟢 Target Frequency Matched";
+                        matchDisplay.innerText = "🟢 Target Frequency " + currentTargetFrequency + " Matched";
                     }
                 } else {
-                    matchDisplay.innerText = "🔴 Target Frequency NOT Matched";
+                    matchDisplay.innerText = "🔴 Target Frequency " + currentTargetFrequency + " NOT Matched";
                     matchStartTime = null;
                     clearInterval(countdownTimer);
                 }
