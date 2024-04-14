@@ -103,6 +103,8 @@ window.onload = function() {
         const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
         const movingAverageSize = 10;  // Number of samples to average
         const recentFrequencies = [];  // Buffer to store recent frequency values
+        const debounceDelay = 100;  // Delay in milliseconds
+        let lastDebounceTime = 0;
     
         function update() {
             if (!isListening) return;
@@ -126,18 +128,23 @@ window.onload = function() {
                 const frequencyDifference = Math.abs(averageFrequency - currentTargetFrequency);
                 document.getElementById('frequency').innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz (Difference: ${frequencyDifference.toFixed(2)} Hz)`;
     
-                if (frequencyDifference <= tolerance) {
-                    if (!matchStartTime) {
-                        matchStartTime = Date.now();
-                        countdownTimer = setInterval(function() {
-                            updateCountdown(matchStartTime, parseInt(targetDuration.value), matchDisplay, matchDisplays);
-                        }, 100);
-                        matchDisplay.innerText = "🟢 Target Frequency Matched";
+                // Debouncing logic to avoid rapid matching
+                const currentTime = Date.now();
+                if (currentTime - lastDebounceTime > debounceDelay) {
+                    if (frequencyDifference <= tolerance) {
+                        if (!matchStartTime) {
+                            matchStartTime = Date.now();
+                            countdownTimer = setInterval(function() {
+                                updateCountdown(matchStartTime, parseInt(targetDuration.value), matchDisplay, matchDisplays);
+                            }, 100);
+                            matchDisplay.innerText = "🟢 Target Frequency Matched";
+                        }
+                    } else {
+                        matchDisplay.innerText = "🔴 Target Frequency NOT Matched";
+                        matchStartTime = null;
+                        clearInterval(countdownTimer);
                     }
-                } else {
-                    matchDisplay.innerText = "🔴 Target Frequency NOT Matched";
-                    matchStartTime = null;
-                    clearInterval(countdownTimer);
+                    lastDebounceTime = currentTime;  // Update lastDebounceTime
                 }
             }
     
@@ -145,7 +152,8 @@ window.onload = function() {
         }
     
         requestAnimationFrame(update);
-    }    
+    }
+    
 
     function updateCountdown(startTime, targetDuration, matchDisplay, matchDisplays) {
         const now = Date.now();
