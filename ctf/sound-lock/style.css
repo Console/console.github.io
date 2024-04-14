@@ -27,6 +27,9 @@ button:hover {
     background-color: #45a049; /* Slightly darker green on hover */
 }
 
+#resetButton {
+    background-color: red;
+}
 
 input[type="range"],
 input[type="number"] {
