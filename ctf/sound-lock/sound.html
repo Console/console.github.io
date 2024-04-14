@@ -4,29 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sound Frequency Analyzer</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Sound Frequency Analyzer</h1>
     <button id="start">Start Listening</button>
-    <div>
-        <label for="gain">Mic Gain: </label>
-        <input type="range" id="gain" min="0" max="10" step="0.1" value="1">
-    </div>
-    <div>
-        <label for="lowFreq">Low Frequency (Hz):</label>
-        <input type="number" id="lowFreq" value="300">
-        <label for="highFreq">High Frequency (Hz):</label>
-        <input type="number" id="highFreq" value="500">
-    </div>
-    <div>
-        <label for="targetDuration">Target Duration (seconds):</label>
-        <input type="number" id="targetDuration" value="2">
+    
+    <button id="configBtn">Settings ⚙️</button>
+    <div id="configPanel" style="display: none;">
+        <div>
+            <label for="gain">Mic Gain: </label>
+            <input type="range" id="gain" min="0" max="10" step="0.1" value="1">
+        </div>
+        <div>
+            <label for="lowFreq">Low Frequency (Hz):</label>
+            <input type="number" id="lowFreq" value="300">
+            <label for="highFreq">High Frequency (Hz):</label>
+            <input type="number" id="highFreq" value="500">
+        </div>
+        <div>
+            <label for="targetDuration">Target Duration (seconds):</label>
+            <input type="number" id="targetDuration" value="2">
+        </div>
     </div>
     
     <div id="frequency">Frequency: 0 Hz</div>
-    <div id="match">Match: No</div>
-
-
+    <div id="matchDisplay">
+        <img src="red_light.png" alt="Status Light">
+    </div>
+    <div id="countdownDisplay">2.00s</div>
+    
     <script src="script.js"></script>
 </body>
 </html>

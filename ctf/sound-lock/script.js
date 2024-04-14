@@ -1,7 +1,8 @@
 window.onload = function() {
     const startButton = document.getElementById('start');
     const frequencyDisplay = document.getElementById('frequency');
-    const matchDisplay = document.getElementById('match');
+    const matchDisplay = document.getElementById('matchDisplay');
+    const countdownDisplay = document.getElementById('countdownDisplay');
     const gainControl = document.getElementById('gain');
     const lowFreq = document.getElementById('lowFreq');
     const highFreq = document.getElementById('highFreq');
@@ -13,10 +14,17 @@ window.onload = function() {
     let bandPassFilter;
     let isListening = false;
     let streamReference;
-    let frequencySum = 0;
-    let frequencyCount = 0;
-    let matchStartTime = null; // Store the start time when a match is found
+    let matchStartTime = null;
     let countdownTimer = null;
+
+    document.getElementById('configBtn').addEventListener('click', function() {
+        var panel = document.getElementById('configPanel');
+        if (panel.style.display === 'none') {
+            panel.style.display = 'block';
+        } else {
+            panel.style.display = 'none';
+        }
+    });
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
@@ -55,22 +63,27 @@ window.onload = function() {
                 alert('Error accessing the microphone: ' + error.message);
             });
         } else {
-            if (microphone) {
-                microphone.disconnect();
-                gainNode.disconnect();
-                bandPassFilter.disconnect();
-                if (streamReference) {
-                    let tracks = streamReference.getTracks();
-                    tracks.forEach(track => track.stop());
-                }
-            }
-            startButton.textContent = "Start Listening";
-            isListening = false;
-            matchStartTime = null; // Reset match start time
-            clearInterval(countdownTimer); // Clear the countdown timer if running
-            matchDisplay.innerText = "Match: No";
+            stopListening();
         }
     });
+
+    function stopListening() {
+        if (microphone) {
+            microphone.disconnect();
+            gainNode.disconnect();
+            bandPassFilter.disconnect();
+            if (streamReference) {
+                let tracks = streamReference.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+        }
+        startButton.textContent = "Start Listening";
+        isListening = false;
+        matchStartTime = null; // Reset match start time
+        clearInterval(countdownTimer); // Clear the countdown timer if running
+        matchDisplay.innerHTML = '<img src="red_light.png" alt="Red Light">';
+        countdownDisplay.textContent = "";
+    }
 
     function analyzeSound() {
         const dataArray = new Uint8Array(analyser.fftSize);
@@ -82,57 +95,47 @@ window.onload = function() {
             const frequency = findFrequency(dataArray, audioContext.sampleRate);
 
             if (frequency !== 0) {
-                frequencySum += frequency;
-                frequencyCount++;
-            }
+                const averageFrequency = frequency;
+                frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
 
-            const now = Date.now();
-            const averageFrequency = frequencySum / frequencyCount;
-            frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
-
-            const lowValue = parseInt(lowFreq.value);
-            const highValue = parseInt(highFreq.value);
-            if (averageFrequency >= lowValue && averageFrequency <= highValue) {
-                if (!matchStartTime) {
-                    matchStartTime = now; // Start the timer
-                    // Start countdown timer
-                    countdownTimer = setInterval(function() {
-                        const timePassed = (Date.now() - matchStartTime) / 1000;
-                        const timeLeft = parseInt(targetDuration.value) - timePassed;
-                        if (timeLeft > 0) {
-                            matchDisplay.innerText = `Match: Yes, ${timeLeft.toFixed(1)}s until duration met`;
-                        } else {
-                            matchDisplay.innerText = "Match: Yes, duration met";
-                            clearInterval(countdownTimer); // Clear countdown timer when duration is met
-                        }
-                    }, 100); // Update every 100 ms for smooth countdown
+                const lowValue = parseInt(lowFreq.value);
+                const highValue = parseInt(highFreq.value);
+                if (averageFrequency >= lowValue && averageFrequency <= highValue) {
+                    if (!matchStartTime) {
+                        matchStartTime = Date.now(); // Start the timer
+                        countdownTimer = setInterval(function() {
+                            updateCountdown(matchStartTime, parseInt(targetDuration.value));
+                        }, 100); // Update every 100 ms for smooth countdown
+                        matchDisplay.innerHTML = '<img src="yellow_light.png" alt="Yellow Light">';
+                    }
+                } else {
+                    stopListening();
                 }
-            } else {
-                matchDisplay.innerText = "Match: No";
-                matchStartTime = null; // Reset the timer
-                clearInterval(countdownTimer); // Clear the countdown timer
             }
 
-            frequencySum = 0;
-            frequencyCount = 0;
             requestAnimationFrame(update);
         }
 
         requestAnimationFrame(update);
     }
 
-    function updateBandPassFilter() {
-        const lowValue = parseInt(lowFreq.value);
-        const highValue = parseInt(highFreq.value);
-        bandPassFilter.frequency.value = (lowValue + highValue) / 2;
-        bandPassFilter.Q.value = bandPassFilter.frequency.value / (highValue - lowValue);
+    function updateCountdown(startTime, targetDuration) {
+        const now = Date.now();
+        const elapsed = (now - startTime) / 1000;
+        const timeLeft = targetDuration - elapsed;
+
+        if (timeLeft > 0) {
+            countdownDisplay.textContent = `${timeLeft.toFixed(1)}s`;
+        } else {
+            clearInterval(countdownTimer);
+            countdownDisplay.textContent = "";
+            matchDisplay.innerHTML = '<img src="green_light.png" alt="Green Light">';
+        }
     }
 
     function findFrequency(dataArray, sampleRate) {
         let lastCrossing = 0;
         let numCrossings = 0;
-
-        // Find zero-crossings
         for (let i = 1; i < dataArray.length; i++) {
             if ((dataArray[i-1] < 128) && (dataArray[i] >= 128)) {
                 if (lastCrossing > 0) {
@@ -147,5 +150,12 @@ window.onload = function() {
             return sampleRate / avgPeriod;
         }
         return 0; // Return 0 if no frequency found
+    }
+
+    function updateBandPassFilter() {
+        const lowValue = parseInt(lowFreq.value);
+        const highValue = parseInt(highFreq.value);
+        bandPassFilter.frequency.value = (lowValue + highValue) / 2;
+        bandPassFilter.Q.value = bandPassFilter.frequency.value / (highValue - lowValue);
     }
 };

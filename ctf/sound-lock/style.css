@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    text-align: center;
+}
+
+#configPanel {
+    margin: 20px auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+input[type="range"],
+input[type="number"] {
+    width: 100px;
+}
+
+#matchDisplay img {
+    width: 100px;
+    height: 100px;
+}
+
+#countdownDisplay {
+    font-size: 48px; /* Large font for visibility */
+    color: red; /* Red color for the digits */
+    background-color: black; /* Black background to mimic digital displays */
+    font-family: 'Digital-7', monospace; /* Font that mimics digital 7-segment displays; ensure you have this font or similar */
+    display: inline-block;
+    padding: 10px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+/* Collapsible Panel */
+#configBtn {
+    margin: 10px;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
