@@ -96,7 +96,7 @@ window.onload = function() {
                     if (!isMatched) {
                         startTime = now; // Start timing
                         isMatched = true;
-                    } else if (now - startTime >= parseInt(targetDuration.value) * 1000) {
+                    } else if (now - startTime >= (parseInt(targetDuration.value) * 1000)) {
                         matchDisplay.innerText = "Match: Yes, duration met";
                     } else {
                         matchDisplay.innerText = "Match: Yes";
