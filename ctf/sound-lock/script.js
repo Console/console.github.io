@@ -5,10 +5,10 @@ window.onload = function() {
     const secondMatchDisplay = document.getElementById('secondMatchDisplay');
     const thirdMatchDisplay = document.getElementById('thirdMatchDisplay');
     const challengeCompleteDisplay = document.getElementById('challengeCompleteDisplay');
-    const gainControl = 1;
-    const lowFreq = 200;
-    const highFreq = 500;
-    const targetDuration = 2;
+    const gainControl = "1";
+    const lowFreq = "200";
+    const highFreq = "500";
+    const targetDuration = "2";
     const targetFrequencies = [261, 293, 329]; // Array of target frequencies
     const tolerance = 10; // Tolerance for frequency matching
     let audioContext;
@@ -96,30 +96,20 @@ window.onload = function() {
     function analyzeSound() {
         const dataArray = new Uint8Array(analyser.fftSize);
         const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
-        const movingAverageSize = 10;  // Number of samples to average
-        const recentFrequencies = [];  // Buffer to store recent frequency values
-    
+
         function update() {
             if (!isListening) return;
             analyser.getByteTimeDomainData(dataArray);
             const frequency = findFrequency(dataArray, audioContext.sampleRate);
-    
+
             if (frequency !== 0) {
-                // Update the moving average buffer
-                if (recentFrequencies.length >= movingAverageSize) {
-                    recentFrequencies.shift();  // Remove the oldest frequency
-                }
-                recentFrequencies.push(frequency);  // Add the new frequency
-                const averageFrequency = recentFrequencies.reduce((sum, curr) => sum + curr, 0) / recentFrequencies.length;
-    
-                frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
-    
+                frequencyDisplay.innerText = `Frequency: ${frequency.toFixed(2)} Hz`;
+
                 let currentTargetFrequency = targetFrequencies[currentTargetIndex];
                 let matchDisplays = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay];
                 let matchDisplay = matchDisplays[currentTargetIndex];
-    
-                const frequencyDifference = Math.abs(averageFrequency - currentTargetFrequency);
-                if (frequencyDifference <= tolerance) {
+
+                if (Math.abs(frequency - currentTargetFrequency) <= tolerance) {
                     if (!matchStartTime) {
                         matchStartTime = Date.now();
                         countdownTimer = setInterval(function() {
@@ -133,13 +123,12 @@ window.onload = function() {
                     clearInterval(countdownTimer);
                 }
             }
-    
+
             requestAnimationFrame(update);
         }
-    
+
         requestAnimationFrame(update);
     }
-    
 
     function updateCountdown(startTime, targetDuration, matchDisplay, matchDisplays) {
         const now = Date.now();
