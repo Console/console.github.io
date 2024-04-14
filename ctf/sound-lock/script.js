@@ -132,10 +132,10 @@ window.onload = function() {
                         countdownTimer = setInterval(function() {
                             updateCountdown(matchStartTime, parseInt(targetDuration.value), matchDisplay, matchDisplays);
                         }, 100);
-                        matchDisplay.innerText = "🟢 Target Frequency " + currentTargetFrequency + " Matched";
+                        matchDisplay.innerText = "🟢 Target Frequency " + currentTargetIndex + " Matched";
                     }
                 } else {
-                    matchDisplay.innerText = "🔴 Target Frequency " + currentTargetFrequency + " NOT Matched";
+                    matchDisplay.innerText = "🔴 Target Frequency " + currentTargetIndex + " NOT Matched";
                     matchStartTime = null;
                     clearInterval(countdownTimer);
                 }
