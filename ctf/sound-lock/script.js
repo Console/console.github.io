@@ -23,7 +23,7 @@ window.onload = function() {
         } else {
             panel.style.display = 'none';
         }
-    });
+    })
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
