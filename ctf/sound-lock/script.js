@@ -2,7 +2,6 @@ window.onload = function() {
     const startButton = document.getElementById('start');
     const frequencyDisplay = document.getElementById('frequency');
     const matchDisplay = document.getElementById('matchDisplay');
-    const countdownDisplay = document.getElementById('countdownDisplay');
     const gainControl = document.getElementById('gain');
     const lowFreq = document.getElementById('lowFreq');
     const highFreq = document.getElementById('highFreq');
@@ -79,10 +78,9 @@ window.onload = function() {
         }
         startButton.textContent = "Start Listening";
         isListening = false;
-        matchStartTime = null; // Reset match start time
-        clearInterval(countdownTimer); // Clear the countdown timer if running
-        matchDisplay.innerHTML = '<img src="red_light.png" alt="Red Light">';
-        countdownDisplay.textContent = "";
+        matchStartTime = null;
+        clearInterval(countdownTimer);
+        matchDisplay.textContent = "Status: 🔴"; // Red emoji for no match
     }
 
     function analyzeSound() {
@@ -102,11 +100,11 @@ window.onload = function() {
                 const highValue = parseInt(highFreq.value);
                 if (averageFrequency >= lowValue && averageFrequency <= highValue) {
                     if (!matchStartTime) {
-                        matchStartTime = Date.now(); // Start the timer
+                        matchStartTime = Date.now();
                         countdownTimer = setInterval(function() {
                             updateCountdown(matchStartTime, parseInt(targetDuration.value));
-                        }, 100); // Update every 100 ms for smooth countdown
-                        matchDisplay.innerHTML = '<img src="yellow_light.png" alt="Yellow Light">';
+                        }, 100);
+                        matchDisplay.textContent = "Status: 🟡"; // Yellow emoji during countdown
                     }
                 } else {
                     stopListening();
@@ -125,11 +123,10 @@ window.onload = function() {
         const timeLeft = targetDuration - elapsed;
 
         if (timeLeft > 0) {
-            countdownDisplay.textContent = `${timeLeft.toFixed(1)}s`;
+            matchDisplay.textContent = `Status: 🟡 - ${timeLeft.toFixed(1)}s remaining`;
         } else {
             clearInterval(countdownTimer);
-            countdownDisplay.textContent = "";
-            matchDisplay.innerHTML = '<img src="green_light.png" alt="Green Light">';
+            matchDisplay.textContent = "Status: 🟢"; // Green emoji for match with duration met
         }
     }
 
