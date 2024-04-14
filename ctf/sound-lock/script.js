@@ -40,7 +40,7 @@ window.onload = function() {
                 gainNode.connect(bandPassFilter);
                 bandPassFilter.connect(analyser);
                 analyzeSound();
-                startButton.textContent = "Stop Listening &bnsp;&nbsp;";
+                startButton.textContent = "Stop Listening  ";
                 startButton.classList.add('button-stop'); // Change button to red
                 isListening = true;
             }).catch(function(error) {
