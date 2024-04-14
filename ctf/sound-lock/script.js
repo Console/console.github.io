@@ -9,7 +9,7 @@ window.onload = function() {
     const lowFreq = document.getElementById('lowFreq');
     const highFreq = document.getElementById('highFreq');
     const targetDuration = document.getElementById('targetDuration');
-    const targetFrequencies = [261, 293, 329]; // Array of target frequencies
+    const targetFrequencies = [256, 293, 329]; // Array of target frequencies
     const tolerance = 10; // Tolerance for frequency matching
     let audioContext;
     let analyser;
