@@ -132,10 +132,10 @@ window.onload = function() {
                         countdownTimer = setInterval(function() {
                             updateCountdown(matchStartTime, parseInt(targetDuration.value), matchDisplay, matchDisplays);
                         }, 100);
-                        matchDisplay.innerText = "🟢 Target Frequency " + currentTargetIndex + " Matched";
+                        matchDisplay.innerText = "🟢 Target Frequency Matched";
                     }
                 } else {
-                    matchDisplay.innerText = "🔴 Target Frequency " + currentTargetIndex + " NOT Matched";
+                    matchDisplay.innerText = "🔴 Target Frequency NOT Matched";
                     matchStartTime = null;
                     clearInterval(countdownTimer);
                 }
@@ -153,10 +153,10 @@ window.onload = function() {
         const timeLeft = targetDuration - elapsed;
 
         if (timeLeft > 0) {
-            matchDisplay.innerText = `🟡 Target Frequency ${currentTargetIndex} Matched, ${timeLeft.toFixed(1)}s remaining`;
+            matchDisplay.innerText = `🟡 Target Frequency Matched, ${timeLeft.toFixed(1)}s remaining`;
         } else {
             clearInterval(countdownTimer);
-            matchDisplay.innerText = "🟢 Target Frequency Matched, Target Duration met";
+            matchDisplay.innerText = "🟢 Target Frequency Matched, Target Duration Met";
             currentTargetIndex++;
             if (currentTargetIndex < targetFrequencies.length) {
                 matchDisplays[currentTargetIndex].style.display = "block"; // Show the next target display
