@@ -3,15 +3,18 @@ window.onload = function() {
     const frequencyDisplay = document.getElementById('frequency');
     const matchDisplay = document.getElementById('match');
     const gainControl = document.getElementById('gain');
+    const lowFreq = document.getElementById('lowFreq');
+    const highFreq = document.getElementById('highFreq');
     let audioContext;
     let analyser;
     let microphone;
     let gainNode;
+    let bandPassFilter;
     let isListening = false;
     let streamReference;
-    let frequencies = []; // Array to keep the last N frequencies
-    const numAverages = 10; // Number of averages for moving average calculation
-    const updateInterval = 500; // Update frequency display every 500ms
+    let frequencySum = 0;
+    let frequencyCount = 0;
+    const updateInterval = 500; // Debounce interval in ms
     let lastUpdateTime = 0;
 
     startButton.addEventListener('click', function() {
@@ -19,12 +22,18 @@ window.onload = function() {
             try {
                 audioContext = new AudioContext();
                 analyser = audioContext.createAnalyser();
-                analyser.fftSize = 4096; // Increased FFT size for better resolution
+                analyser.fftSize = 4096; // Increased FFT size
                 gainNode = audioContext.createGain();
                 gainNode.gain.value = gainControl.value;
+
+                bandPassFilter = audioContext.createBiquadFilter();
+                bandPassFilter.type = 'bandpass';
+                updateBandPassFilter(); // Update filter settings based on initial input values
+
                 gainControl.oninput = function() {
                     gainNode.gain.value = this.value;
                 };
+                lowFreq.oninput = highFreq.oninput = updateBandPassFilter;
             } catch (error) {
                 alert('Web Audio API not supported by your browser');
                 return;
@@ -36,7 +45,8 @@ window.onload = function() {
                 streamReference = stream;
                 microphone = audioContext.createMediaStreamSource(stream);
                 microphone.connect(gainNode);
-                gainNode.connect(analyser);
+                gainNode.connect(bandPassFilter);
+                bandPassFilter.connect(analyser);
                 analyzeSound();
                 startButton.textContent = "Stop Listening";
                 isListening = true;
@@ -47,6 +57,7 @@ window.onload = function() {
             if (microphone) {
                 microphone.disconnect();
                 gainNode.disconnect();
+                bandPassFilter.disconnect();
                 if (streamReference) {
                     let tracks = streamReference.getTracks();
                     tracks.forEach(track => track.stop());
@@ -67,14 +78,25 @@ window.onload = function() {
             const frequency = findFrequency(dataArray, audioContext.sampleRate);
 
             if (frequency !== 0) {
-                frequencies.push(frequency);
-                if (frequencies.length > numAverages) frequencies.shift(); // Keep only the last N frequencies
+                frequencySum += frequency;
+                frequencyCount++;
             }
 
             const now = Date.now();
             if (now - lastUpdateTime > updateInterval) {
-                const averageFrequency = frequencies.reduce((a, b) => a + b, 0) / frequencies.length;
+                const averageFrequency = frequencySum / frequencyCount;
                 frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
+
+                const lowValue = parseInt(lowFreq.value);
+                const highValue = parseInt(highFreq.value);
+                if (averageFrequency >= lowValue && averageFrequency <= highValue) {
+                    matchDisplay.innerText = "Match: Yes";
+                } else {
+                    matchDisplay.innerText = "Match: No";
+                }
+                // Reset for next average calculation
+                frequencySum = 0;
+                frequencyCount = 0;
                 lastUpdateTime = now;
             }
 
@@ -84,9 +106,18 @@ window.onload = function() {
         requestAnimationFrame(update);
     }
 
+    function updateBandPassFilter() {
+        const lowValue = parseInt(lowFreq.value);
+        const highValue = parseInt(highFreq.value);
+        bandPassFilter.frequency.value = (lowValue + highValue) / 2;
+        bandPassFilter.Q.value = bandPassFilter.frequency.value / (highValue - lowValue);
+    }
+
     function findFrequency(dataArray, sampleRate) {
         let lastCrossing = 0;
         let numCrossings = 0;
+
+        // Find zero-crossings
         for (let i = 1; i < dataArray.length; i++) {
             if ((dataArray[i-1] < 128) && (dataArray[i] >= 128)) {
                 if (lastCrossing > 0) {
@@ -95,10 +126,11 @@ window.onload = function() {
                 lastCrossing = i;
             }
         }
+
         if (numCrossings > 0) {
             const avgPeriod = (lastCrossing / numCrossings);
             return sampleRate / avgPeriod;
         }
-        return 0;
+        return 0; // Return 0 if no frequency found
     }
 };
