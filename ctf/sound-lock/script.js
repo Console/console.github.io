@@ -115,10 +115,10 @@ window.onload = function() {
                         countdownTimer = setInterval(function() {
                             updateCountdown(matchStartTime, parseInt(targetDuration.value), matchDisplay, matchDisplays);
                         }, 100);
-                        matchDisplay.innerText = "Match: Yes";
+                        matchDisplay.innerText = "🟢 Target Frequency " + currentTargetFrequency + " Matched";
                     }
                 } else {
-                    matchDisplay.innerText = "Match: No";
+                    matchDisplay.innerText = "🔴 Target Frequency " + currentTargetFrequency + " NOT Matched";
                     matchStartTime = null;
                     clearInterval(countdownTimer);
                 }
@@ -136,10 +136,10 @@ window.onload = function() {
         const timeLeft = targetDuration - elapsed;
 
         if (timeLeft > 0) {
-            matchDisplay.innerText = `Match: Yes, ${timeLeft.toFixed(1)}s remaining`;
+            matchDisplay.innerText = `🟡 Target Frequency ${currentTargetIndex} Matched, ${timeLeft.toFixed(1)}s remaining`;
         } else {
             clearInterval(countdownTimer);
-            matchDisplay.innerText = "Match: Yes, duration met";
+            matchDisplay.innerText = "🟢 Target Frequency Matched, Target Duration met";
             currentTargetIndex++;
             if (currentTargetIndex < targetFrequencies.length) {
                 matchDisplays[currentTargetIndex].style.display = "block"; // Show the next target display
@@ -147,7 +147,7 @@ window.onload = function() {
             } else {
                 // All targets matched, challenge completed
                 matchDisplays.forEach(display => {
-                display.innerText = "Match: Yes, duration met"; // Update all displays to show matched
+                display.innerText = "🟢 Target Frequency Matched, Target Duration Met"; // Update all displays to show matched
                 });
                 challengeCompleteDisplay.innerText = "Challenge Completed";
                 challengeCompleteDisplay.style.display = "block";
