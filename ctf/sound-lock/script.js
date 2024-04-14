@@ -55,6 +55,35 @@ window.onload = function() {
         }
     });
 
+    document.getElementById('resetButton').addEventListener('click', function() {
+        // Reset all match statuses
+        const matchDisplays = [document.getElementById('firstMatchDisplay'), document.getElementById('secondMatchDisplay'), document.getElementById('thirdMatchDisplay')];
+        matchDisplays.forEach(display => {
+            display.innerText = "Match: No";
+            display.style.display = "none"; // Hide all but the first display
+        });
+        matchDisplays[0].style.display = "block"; // Only show the first target
+    
+        // Hide challenge complete message
+        document.getElementById('challengeCompleteDisplay').style.display = "none";
+    
+        // Reset current target index
+        currentTargetIndex = 0;
+    
+        // Stop and reset all audio processing and timers if running
+        stopListening();
+    
+        // Reset interface
+        if (countdownTimer) {
+            clearInterval(countdownTimer);
+        }
+        if (isListening) {
+            stopListening();
+        }
+        document.getElementById('start').textContent = "Start Listening"; // Reset start button text
+        document.getElementById('frequency').innerText = "Frequency: -- Hz"; // Reset frequency display
+    });
+    
     function stopListening() {
         if (microphone) {
             microphone.disconnect();
@@ -62,12 +91,9 @@ window.onload = function() {
             bandPassFilter.disconnect();
             streamReference.getTracks().forEach(track => track.stop());
         }
-        startButton.textContent = "Start Listening";
         isListening = false;
         clearInterval(countdownTimer);
-        firstMatchDisplay.innerText = "First Match: No";
-        secondMatchDisplay.style.display = "none";
-        thirdMatchDisplay.style.display = "none";
+        document.getElementById('start').textContent = "Start Listening";
     }
 
     function analyzeSound() {
@@ -123,6 +149,9 @@ window.onload = function() {
                 matchStartTime = null; // Reset start time for the next frequency matching
             } else {
                 // All targets matched, challenge completed
+                matchDisplays.forEach(display => {
+                display.innerText = "Match: Yes, duration met"; // Update all displays to show matched
+                });
                 challengeCompleteDisplay.innerText = "Challenge Completed";
                 challengeCompleteDisplay.style.display = "block";
                 stopListening(); // Optionally stop listening after all targets are matched

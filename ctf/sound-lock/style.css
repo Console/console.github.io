@@ -12,6 +12,21 @@ body {
     border-radius: 5px;
     background-color: #fff;
 }
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #45a049; /* Slightly darker green on hover */
+}
+
 
 input[type="range"],
 input[type="number"] {
@@ -21,6 +36,17 @@ input[type="number"] {
 #matchDisplay img {
     width: 100px;
     height: 100px;
+}
+
+#challengeCompleteDisplay {
+    font-size: 48px; /* Large font for visibility */
+    color: green; /* Green color for the text */
+    background-color: black; /* Black background for contrast */
+    font-family: 'Digital-7', monospace; /* Font that mimics digital 7-segment displays */
+    display: inline-block;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
 }
 
 #countdownDisplay {
