@@ -5,9 +5,6 @@ window.onload = function() {
     const secondMatchDisplay = document.getElementById('secondMatchDisplay');
     const thirdMatchDisplay = document.getElementById('thirdMatchDisplay');
     const challengeCompleteDisplay = document.getElementById('challengeCompleteDisplay');
-    const gainControl = document.getElementById('gain');
-    const lowFreq = document.getElementById('lowFreq');
-    const highFreq = document.getElementById('highFreq');
     const targetFrequencies = [256, 293, 329]; // Array of target frequencies
     const tolerance = 10; // Tolerance for frequency matching
     const targetDuration = 2000; // Duration in milliseconds
@@ -20,11 +17,6 @@ window.onload = function() {
     let streamReference;
     let currentTargetIndex = 0; // Index to track the current target frequency
     let countdownTimer = null;
-
-    document.getElementById('configBtn').addEventListener('click', function() {
-        var panel = document.getElementById('configPanel');
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    });
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
