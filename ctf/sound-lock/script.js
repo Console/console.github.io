@@ -97,7 +97,7 @@ window.onload = function() {
         const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
         const movingAverageSize = 10;  // Number of samples to average
         const recentFrequencies = [];  // Buffer to store recent frequency values
-        const debounceDelay = 100;  // Delay in milliseconds
+        const debounceDelay = 10;  // Delay in milliseconds
         let lastDebounceTime = 0;
     
         function update() {
@@ -164,6 +164,7 @@ window.onload = function() {
             } else {
                 matchDisplays.forEach(display => {
                     display.innerText = "🟢 Target Frequency Matched, Target Duration Met"; // Update all displays to show matched
+                    matchDisplays[currentTargetIndex].style.display = "block";
                 });
                 challengeCompleteDisplay.innerHTML = "Challenge Completed<br/><span id='flagSpan'>flag{Canu_r_Dydd_a_Chanu_r_Nos}</span>";
                 challengeCompleteDisplay.style.display = "block";
