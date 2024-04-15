@@ -92,3 +92,22 @@ input[type="number"] {
     font-size: 16px;
     cursor: pointer;
 }
+
+/*Hand Meter Stuff*/
+#dial {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 5px solid black;
+    position: relative;
+  }
+  #hand {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: 50% 100%;
+    transform: translateX(-50%) rotate(0deg);
+    width: 2px;
+    height: 100px;
+    background-color: red;
+  }
