@@ -5,9 +5,9 @@ window.onload = function() {
     const secondMatchDisplay = document.getElementById('secondMatchDisplay');
     const thirdMatchDisplay = document.getElementById('thirdMatchDisplay');
     const challengeCompleteDisplay = document.getElementById('challengeCompleteDisplay');
-    const targetFrequencies = [256, 293, 329];
-    const tolerance = 10;
-    const targetDuration = 2000;
+    const targetFrequencies = [256, 293, 329]; // Array of target frequencies
+    const tolerance = 10; // Tolerance for frequency matching
+    const targetDuration = 2000; // Duration in milliseconds
     let audioContext;
     let analyser;
     let microphone;
@@ -15,25 +15,23 @@ window.onload = function() {
     let bandPassFilter;
     let isListening = false;
     let streamReference;
-    let currentTargetIndex = 0;
+    let currentTargetIndex = 0; // Index to track the current target frequency
     let countdownTimer = null;
-
-    console.log("Application loaded and initial setup complete.");
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
-            console.log("Initializing Audio Context and components...");
             audioContext = new AudioContext();
             analyser = audioContext.createAnalyser();
             analyser.fftSize = 4096;
             gainNode = audioContext.createGain();
             bandPassFilter = audioContext.createBiquadFilter();
             bandPassFilter.type = 'bandpass';
+            bandPassFilter.frequency.value = 600; // hardcoded center frequency for the bandpass filter
+            bandPassFilter.Q.value = 1.5; // hardcoded Q value for the bandpass filter
             updateBandPassFilter();
         }
 
         if (!isListening) {
-            console.log("Starting audio processing...");
             navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
                 streamReference = stream;
                 microphone = audioContext.createMediaStreamSource(stream);
@@ -41,98 +39,46 @@ window.onload = function() {
                 gainNode.connect(bandPassFilter);
                 bandPassFilter.connect(analyser);
                 analyzeSound();
-                startButton.textContent = "Stop Listening";
-                startButton.classList.add('button-stop');
+                startButton.textContent = "Stop Listening  ";
+                startButton.classList.add('button-stop'); // Change button to red
                 isListening = true;
             }).catch(function(error) {
-                console.error('Error accessing the microphone: ' + error.message);
+                alert('Error accessing the microphone: ' + error.message);
             });
         } else {
-            console.log("Stopping audio processing...");
             stopListening();
         }
     });
 
-    function analyzeSound() {
-        const dataArray = new Uint8Array(analyser.fftSize);
-        const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
-        const recentFrequencies = [];
-        const debounceDelay = 10;
-        let lastDebounceTime = 0;
-
-        function update() {
-            if (!isListening) return;
-            analyser.getByteTimeDomainData(dataArray);
-            const frequency = findFrequency(dataArray, audioContext.sampleRate);
-            console.log(`Detected Frequency: ${frequency} Hz`);
-
-            if (frequency !== 0) {
-                recentFrequencies.push(frequency);
-                if (recentFrequencies.length > 10) recentFrequencies.shift();
-                const averageFrequency = recentFrequencies.reduce((sum, curr) => sum + curr, 0) / recentFrequencies.length;
-
-                frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
-                console.log(`Smoothed Frequency: ${averageFrequency.toFixed(2)} Hz`);
-
-                let currentTargetFrequency = targetFrequencies[currentTargetIndex];
-                let matchDisplay = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay][currentTargetIndex];
-
-                const frequencyDifference = Math.abs(averageFrequency - currentTargetFrequency);
-                const currentTime = Date.now();
-                if (currentTime - lastDebounceTime > debounceDelay) {
-                    if (frequencyDifference <= tolerance) {
-                        console.log(`Frequency within tolerance for target ${currentTargetIndex + 1}.`);
-                        if (!countdownTimer) {
-                            matchDisplay.innerText = "🟡 Matching...";
-                            countdownTimer = setInterval(function() {
-                                updateCountdown(currentTargetIndex);
-                            }, 100);
-                        }
-                    } else {
-                        console.log(`Frequency out of tolerance: ${frequencyDifference.toFixed(2)} Hz difference.`);
-                        matchDisplay.innerText = "🔴 Not Matched";
-                        clearInterval(countdownTimer);
-                        countdownTimer = null;
-                    }
-                    lastDebounceTime = currentTime;
-                }
-            }
-
-            requestAnimationFrame(update);
+    document.getElementById('resetButton').addEventListener('click', function() {
+        // Reset all match statuses
+        const matchDisplays = [document.getElementById('firstMatchDisplay'), document.getElementById('secondMatchDisplay'), document.getElementById('thirdMatchDisplay')];
+        matchDisplays.forEach(display => {
+            display.innerText = "🔴 Target Frequency NOT Matched";
+            display.style.display = "none"; // Hide all but the first display
+        });
+        matchDisplays[0].style.display = "block"; // Only show the first target
+    
+        // Hide challenge complete message
+        document.getElementById('challengeCompleteDisplay').style.display = "none";
+    
+        // Reset current target index
+        currentTargetIndex = 0;
+    
+        // Stop and reset all audio processing and timers if running
+        stopListening();
+    
+        // Reset interface
+        if (countdownTimer) {
+            clearInterval(countdownTimer);
         }
-
-        requestAnimationFrame(update);
-    }
-
-    function updateCountdown(targetIndex) {
-        let matchDisplay = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay][targetIndex];
-        const startTime = Date.now();
-        const targetTime = startTime + targetDuration;
-
-        function countdown() {
-            const now = Date.now();
-            const timeLeft = targetTime - now;
-            if (timeLeft > 0) {
-                matchDisplay.innerText = `🟡 Matching... ${Math.ceil(timeLeft / 1000)}s remaining`;
-            } else {
-                matchDisplay.innerText = "🟢 Matched";
-                clearInterval(countdownTimer);
-                countdownTimer = null;
-                if (targetIndex < targetFrequencies.length - 1) {
-                    console.log(`Target ${targetIndex + 1} matched. Moving to next.`);
-                    currentTargetIndex++;
-                } else {
-                    console.log("All targets matched. Challenge completed.");
-                    challengeCompleteDisplay.style.display = "block";
-                    challengeCompleteDisplay.innerText = "Challenge Completed!";
-                    stopListening();
-                }
-            }
+        if (isListening) {
+            stopListening();
         }
-
-        countdownTimer = setInterval(countdown, 100);
-    }
-
+        document.getElementById('start').textContent = "Start Listening  ▶️"; // Reset start button text
+        document.getElementById('frequency').innerText = "Frequency: -- Hz"; // Reset frequency display
+    });
+    
     function stopListening() {
         if (microphone) {
             microphone.disconnect();
@@ -142,10 +88,8 @@ window.onload = function() {
         }
         isListening = false;
         clearInterval(countdownTimer);
-        countdownTimer = null;
-        startButton.textContent = "Start Listening ▶️";
-        startButton.classList.remove('button-stop');
-        console.log("Audio processing stopped.");
+        document.getElementById('start').textContent = "Start Listening  ▶️";
+        startButton.classList.remove('button-stop'); // Change button back to normal
     }
 
     function analyzeSound() {
@@ -203,7 +147,7 @@ window.onload = function() {
         requestAnimationFrame(update);
     }
     
-//a
+
     function updateCountdown(startTime, targetDuration, matchDisplay, matchDisplays) {
         const now = Date.now();
         const elapsed = (now - startTime) / 1000; // Convert milliseconds to seconds
@@ -228,11 +172,11 @@ window.onload = function() {
             }
         }
     }
+    
 
     function updateBandPassFilter() {
-        bandPassFilter.frequency.value = 300; // Change to suitable frequency based on your needs
-        bandPassFilter.Q.value = 1.5; // Change Q value based on your needs
-        console.log(`Bandpass Filter updated: Frequency - ${bandPassFilter.frequency.value}, Q - ${bandPassFilter.Q.value}`);
+        bandPassFilter.frequency.value = 600; // hardcoded center frequency for the bandpass filter
+        bandPassFilter.Q.value = 1.5; // hardcoded Q value for the bandpass filter
     }
 
     function findFrequency(dataArray, sampleRate) {
@@ -249,10 +193,8 @@ window.onload = function() {
 
         if (numCrossings > 0) {
             const avgPeriod = (lastCrossing / numCrossings);
-            const calculatedFrequency = sampleRate / avgPeriod;
-            console.log(`Calculated frequency: ${calculatedFrequency}`);
-            return calculatedFrequency;
+            return sampleRate / avgPeriod;
         }
-        return 0;
+        return 0; // Return 0 if no frequency found
     }
 };
