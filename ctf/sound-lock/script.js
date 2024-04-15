@@ -148,6 +148,97 @@ window.onload = function() {
         console.log("Audio processing stopped.");
     }
 
+    function analyzeSound() {
+        const dataArray = new Uint8Array(analyser.fftSize);
+        const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+        const movingAverageSize = 20;  // Number of samples to average
+        const recentFrequencies = [];  // Buffer to store recent frequency values
+        const debounceDelay = 200;  // Delay in milliseconds
+        let lastDebounceTime = 0;
+    
+        function update() {
+            if (!isListening) return;
+            analyser.getByteTimeDomainData(dataArray);
+            const frequency = findFrequency(dataArray, audioContext.sampleRate);
+    
+            if (frequency !== 0) {
+                // Update the moving average buffer
+                if (recentFrequencies.length >= movingAverageSize) {
+                    recentFrequencies.shift();  // Remove the oldest frequency
+                }
+                recentFrequencies.push(frequency);  // Add the new frequency
+                const averageFrequency = recentFrequencies.reduce((sum, curr) => sum + curr, 0) / recentFrequencies.length;
+    
+                frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
+    
+                let currentTargetFrequency = targetFrequencies[currentTargetIndex];
+                let matchDisplays = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay];
+                let matchDisplay = matchDisplays[currentTargetIndex];
+    
+                const frequencyDifference = Math.abs(averageFrequency - currentTargetFrequency);
+                document.getElementById('frequency').innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz (Difference: ${frequencyDifference.toFixed(2)} Hz)`;
+                updateDial(parseInt(frequencyDifference))
+    
+                // Debouncing logic to avoid rapid matching
+                const currentTime = Date.now();
+                if (currentTime - lastDebounceTime > debounceDelay) {
+                    if (frequencyDifference <= tolerance) {
+                        if (!matchStartTime) {
+                            matchStartTime = Date.now();
+                            countdownTimer = setInterval(function() {
+                                updateCountdown(matchStartTime, parseInt(targetDuration), matchDisplay, matchDisplays);
+                            }, 100);
+                        }
+                    } else {
+                        matchDisplay.innerText = "🔴 Target Frequency NOT Matched";
+                        matchStartTime = null;
+                        clearInterval(countdownTimer);
+                    }
+                    lastDebounceTime = currentTime;  // Update lastDebounceTime
+                }
+            }
+    
+            requestAnimationFrame(update);
+        }
+    
+        requestAnimationFrame(update);
+    }
+    
+
+    function updateCountdown(startTime, targetDuration, matchDisplay, matchDisplays) {
+        const now = Date.now();
+        const elapsed = (now - startTime) / 1000; // Convert milliseconds to seconds
+        const timeLeft = (targetDuration / 1000) - elapsed; // Calculate remaining time in seconds
+    
+        if (timeLeft > 0) {
+            matchDisplay.innerText = `🟡 Target Frequency Matching, ${timeLeft.toFixed(1)}s remaining`;
+        } else {
+            clearInterval(countdownTimer);
+            matchDisplay.innerText = "🟢 Target Frequency Matched, Target Duration Met";
+            currentTargetIndex++;
+            if (currentTargetIndex < targetFrequencies.length) {
+                matchDisplays[currentTargetIndex].style.display = "block"; // Show the next target display
+                matchStartTime = null; // Reset start time for the next frequency matching
+            } else {
+                matchDisplays.forEach(display => {
+                    display.innerText = "🟢 Target Frequency Matched, Target Duration Met"; // Update all displays to show matched
+                });
+                challengeCompleteDisplay.innerHTML = "Challenge Completed<br/><span id=flagSpan>flag{Canu_r_Dydd_a_Chanu_r_Nos}</span>";
+                challengeCompleteDisplay.style.display = "block";
+                stopListening();
+            }
+        }
+    }
+    
+    function updateDial(angle) {
+        var angle = parseInt(angle);
+        // Apply ceiling function to bound angle within -180 to 180 range
+        angle = Math.min(Math.max(angle, -180), 180);
+        var hand = document.getElementById("hand");
+        hand.style.transform = "translateX(-50%) rotate(" + angle + "deg)";
+      }
+    
+
     function updateBandPassFilter() {
         bandPassFilter.frequency.value = 300; // Change to suitable frequency based on your needs
         bandPassFilter.Q.value = 1.5; // Change Q value based on your needs
