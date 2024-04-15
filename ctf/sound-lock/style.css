@@ -53,7 +53,7 @@ input[type="number"] {
 }
 
 #challengeCompleteDisplay {
-    font-size: 1.2em; /* Large font for visibility */
+    font-size: 48px; /* Large font for visibility */
     color: green; /* Green color for the text */
     background-color: black; /* Black background for contrast */
     font-family: 'Digital-7', monospace; /* Font that mimics digital 7-segment displays */
@@ -61,17 +61,6 @@ input[type="number"] {
     padding: 20px;
     margin-top: 20px;
     border-radius: 10px;
-}
-
-#flagSpan {
-    display: block; /* Block display to ensure it takes its own line */
-    font-size: 1.0em; /* Relative font size to parent */
-    background-color: #ddf; /* Light blue background for the flag */
-    color: #006; /* Navy text for contrast */
-    padding: 5px; /* Padding around the text */
-    border-radius: 5px; /* Rounded corners */
-    word-wrap: break-word; /* Ensure long strings do not overflow */
-    max-width: 100%; /* Limit width to prevent overflow */
 }
 
 #countdownDisplay {

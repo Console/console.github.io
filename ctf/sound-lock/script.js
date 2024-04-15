@@ -7,7 +7,7 @@ window.onload = function() {
     const challengeCompleteDisplay = document.getElementById('challengeCompleteDisplay');
     const targetFrequencies = [256, 293, 329]; // Array of target frequencies
     const tolerance = 10; // Tolerance for frequency matching
-    const targetDuration = 2000; // Duration in milliseconds
+    const targetDuration = 3000; // Duration in milliseconds
     let audioContext;
     let analyser;
     let microphone;
@@ -54,7 +54,7 @@ window.onload = function() {
         // Reset all match statuses
         const matchDisplays = [document.getElementById('firstMatchDisplay'), document.getElementById('secondMatchDisplay'), document.getElementById('thirdMatchDisplay')];
         matchDisplays.forEach(display => {
-            display.innerText = "🔴 Target Frequency NOT Matched";
+            display.innerText = "Match: No";
             display.style.display = "none"; // Hide all but the first display
         });
         matchDisplays[0].style.display = "block"; // Only show the first target
@@ -166,7 +166,7 @@ window.onload = function() {
                 matchDisplays.forEach(display => {
                     display.innerText = "🟢 Target Frequency Matched, Target Duration Met"; // Update all displays to show matched
                 });
-                challengeCompleteDisplay.innerHTML = "Challenge Completed<br/><span id=flagSpan>flag{Canu_r_Dydd_a_Chanu_r_Nos}</span>";
+                challengeCompleteDisplay.innerHTML = "Challenge Completed<br/>flag{Canu_r_Dydd_a_Chanu_r_Nos}";
                 challengeCompleteDisplay.style.display = "block";
                 stopListening();
             }
