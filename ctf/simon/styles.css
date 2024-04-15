@@ -22,3 +22,12 @@
 .color-button:active {
     opacity: 1;
 }
+
+#control-panel {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#level-display {
+    margin-top: 10px;
+}
