@@ -27,20 +27,21 @@ const colorFrequencies = {
 
 function displayMessage(message) {
     const messageDisplay = document.getElementById('message-display');
-    let messageParagraph = document.createElement('p');
-    messageParagraph.textContent = message;
-    messageDisplay.appendChild(messageParagraph);
+    messageDisplay.textContent = message;
+    setTimeout(() => {
+        messageDisplay.textContent = ''; // Clear message after a delay
+    }, 3000); // Message display duration
 }
 
 function checkLevelMilestones() {
     switch(level) {
-        case 3:
+        case 10:
             displayMessage('Great job! You reached Level 10!');
             break;
-        case 5:
+        case 20:
             displayMessage('Awesome! Level 20 mastered!');
             break;
-        case 8:
+        case 30:
             displayMessage('Incredible! Level 30! Keep going!');
             break;
     }
@@ -66,6 +67,23 @@ function nextSequence() {
     });
 }
 
+// Rest of your JavaScript code...
+
+
+function tryColor(color) {
+    if (!gameActive) return;
+    userSequence.push(color);
+    playSound(colorFrequencies[color]);
+    if (userSequence[userSequence.length - 1] !== sequence[userSequence.length - 1]) {
+        alert("Game Over. Press OK to restart.");
+        stopResetGame();
+    } else if (userSequence.length === sequence.length) {
+        setTimeout(() => {
+            nextSequence();
+        }, 1000);
+    }
+}
+
 function startGame() {
     if (gameActive) return;
     gameActive = true;
@@ -79,12 +97,8 @@ function stopResetGame() {
     sequence = [];
     level = 0;
     document.getElementById('level-display').innerText = "Level: 0";
-    // Optionally clear the message when the game stops/resets
-    document.getElementById('message-display').innerHTML = ""; 
 }
 
-// Initialization code
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('level-display').innerText = "Level: 0";
 });
-
