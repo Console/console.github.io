@@ -19,7 +19,7 @@ body {
     cursor: pointer;
     opacity: 0.8;
     border: 2px solid #333;
-    transition: transform 0.2s, box-shadow 0.2s; /* Smooth transition for transformations */
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 #green { background-color: green; filter: brightness(1.2) saturate(1.5); }
@@ -30,7 +30,7 @@ body {
 .color-button:active, .color-button.highlight {
     opacity: 1;
     transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.75); /* White glow effect */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.75);
 }
 
 #control-panel {
@@ -41,36 +41,10 @@ body {
 #level-display {
     margin-top: 10px;
 }
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    background-color: rgba(0, 0, 0, 0.4); /* Black background with opacity */
-    z-index: 1000; /* Sit on top */
-}
 
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
+#message-display {
     text-align: center;
-}
-
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+    margin-top: 20px;
+    font-size: 20px;
+    color: lime;
 }

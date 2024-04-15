@@ -25,27 +25,24 @@ const colorFrequencies = {
     'blue': 523.25
 };
 
-function showModal(message) {
-    const modal = document.getElementById('modal');
-    const modalText = document.getElementById('modal-text');
-    modalText.textContent = message;
-    modal.style.display = 'block';
-}
-
-function closeModal() {
-    document.getElementById('modal').style.display = 'none';
+function displayMessage(message) {
+    const messageDisplay = document.getElementById('message-display');
+    messageDisplay.textContent = message;
+    setTimeout(() => {
+        messageDisplay.textContent = ''; // Clear message after a delay
+    }, 3000); // Message display duration
 }
 
 function checkLevelMilestones() {
     switch(level) {
-        case 1:
-            showModal('Great job! You reached Level 10!');
+        case 10:
+            displayMessage('Great job! You reached Level 10!');
             break;
-        case 2:
-            showModal('Awesome! Level 20 mastered!');
+        case 20:
+            displayMessage('Awesome! Level 20 mastered!');
             break;
-        case 3:
-            showModal('Incredible! Level 30! Keep going!');
+        case 30:
+            displayMessage('Incredible! Level 30! Keep going!');
             break;
     }
 }
@@ -69,6 +66,9 @@ function nextSequence() {
         }, 1000 * index);
     });
 }
+
+// Rest of your JavaScript code...
+
 
 function tryColor(color) {
     if (!gameActive) return;
