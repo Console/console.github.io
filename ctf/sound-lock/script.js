@@ -17,6 +17,14 @@ window.onload = function() {
     let streamReference;
     let currentTargetIndex = 0; // Index to track the current target frequency
     let countdownTimer = null;
+    let emaFrequency = 0; // Initialize EMA at 0
+    const alpha = 0.1; // Smoothing factor for EMA
+
+    function updateEMA(currentFrequency) {
+        emaFrequency = alpha * currentFrequency + (1 - alpha) * emaFrequency;
+        return emaFrequency;
+    }
+
 
     startButton.addEventListener('click', function() {
         if (!audioContext) {
@@ -95,55 +103,34 @@ window.onload = function() {
     function analyzeSound() {
         const dataArray = new Uint8Array(analyser.fftSize);
         const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
-        const movingAverageSize = 20;  // Number of samples to average
-        const recentFrequencies = [];  // Buffer to store recent frequency values
-        const debounceDelay = 200;  // Delay in milliseconds
-        let lastDebounceTime = 0;
-    
+
         function update() {
             if (!isListening) return;
             analyser.getByteTimeDomainData(dataArray);
             const frequency = findFrequency(dataArray, audioContext.sampleRate);
-    
             if (frequency !== 0) {
-                // Update the moving average buffer
-                if (recentFrequencies.length >= movingAverageSize) {
-                    recentFrequencies.shift();  // Remove the oldest frequency
-                }
-                recentFrequencies.push(frequency);  // Add the new frequency
-                const averageFrequency = recentFrequencies.reduce((sum, curr) => sum + curr, 0) / recentFrequencies.length;
-    
-                frequencyDisplay.innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz`;
-    
+                const smoothedFrequency = updateEMA(frequency);
+                frequencyDisplay.innerText = `Frequency: ${smoothedFrequency.toFixed(2)} Hz`;
+
                 let currentTargetFrequency = targetFrequencies[currentTargetIndex];
-                let matchDisplays = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay];
-                let matchDisplay = matchDisplays[currentTargetIndex];
-    
-                const frequencyDifference = Math.abs(averageFrequency - currentTargetFrequency);
-                document.getElementById('frequency').innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz (Difference: ${frequencyDifference.toFixed(2)} Hz)`;
-    
-                // Debouncing logic to avoid rapid matching
-                const currentTime = Date.now();
-                if (currentTime - lastDebounceTime > debounceDelay) {
-                    if (frequencyDifference <= tolerance) {
-                        if (!matchStartTime) {
-                            matchStartTime = Date.now();
-                            countdownTimer = setInterval(function() {
-                                updateCountdown(matchStartTime, parseInt(targetDuration), matchDisplay, matchDisplays);
-                            }, 100);
-                        }
-                    } else {
-                        matchDisplay.innerText = "🔴 Target Frequency NOT Matched";
-                        matchStartTime = null;
-                        clearInterval(countdownTimer);
+                let matchDisplay = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay][currentTargetIndex];
+                const frequencyDifference = Math.abs(smoothedFrequency - currentTargetFrequency);
+                
+                if (frequencyDifference <= tolerance) {
+                    if (!matchStartTime) {
+                        matchStartTime = Date.now();
+                        countdownTimer = setInterval(function() {
+                            updateCountdown(matchStartTime, parseInt(targetDuration), matchDisplay, [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay]);
+                        }, 100);
                     }
-                    lastDebounceTime = currentTime;  // Update lastDebounceTime
+                } else {
+                    matchDisplay.innerText = "🔴 Target Frequency NOT Matched";
+                    matchStartTime = null;
+                    clearInterval(countdownTimer);
                 }
             }
-    
             requestAnimationFrame(update);
         }
-    
         requestAnimationFrame(update);
     }
     
