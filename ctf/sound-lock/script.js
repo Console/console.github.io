@@ -154,6 +154,7 @@ window.onload = function() {
     
         if (timeLeft > 0) {
             matchDisplay.innerText = `🟡 Target Frequency Matching, ${timeLeft.toFixed(1)}s remaining`;
+            matchDisplays[currentTargetIndex].style.display = "block"; // Ensure the next target display is visible
         } else {
             clearInterval(countdownTimer);
             matchDisplay.innerText = "🟢 Target Frequency Matched, Target Duration Met";
