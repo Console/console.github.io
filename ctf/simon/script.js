@@ -9,7 +9,7 @@ function playSound(frequency) {
     const gainNode = audioContext.createGain();
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    oscillator.type = 'sine';
+    oscillator.type = 'saw';
     oscillator.frequency.value = frequency;
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
     gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.01);
@@ -67,9 +67,6 @@ function nextSequence() {
     });
 }
 
-// Rest of your JavaScript code...
-
-
 function tryColor(color) {
     if (!gameActive) return;
     userSequence.push(color);
@@ -97,6 +94,7 @@ function stopResetGame() {
     sequence = [];
     level = 0;
     document.getElementById('level-display').innerText = "Level: 0";
+    document.getElementById('message-display').innerText = "";
 }
 
 document.addEventListener('DOMContentLoaded', () => {
