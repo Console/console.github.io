@@ -177,7 +177,6 @@ window.onload = function() {
     
                 const frequencyDifference = Math.abs(averageFrequency - currentTargetFrequency);
                 document.getElementById('frequency').innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz (Difference: ${frequencyDifference.toFixed(2)} Hz)`;
-                updateDial(parseInt(frequencyDifference))
     
                 // Debouncing logic to avoid rapid matching
                 const currentTime = Date.now();
@@ -229,15 +228,6 @@ window.onload = function() {
             }
         }
     }
-    
-    function updateDial(angle) {
-        var angle = parseInt(angle);
-        // Apply ceiling function to bound angle within -180 to 180 range
-        angle = Math.min(Math.max(angle, -180), 180);
-        var hand = document.getElementById("hand");
-        hand.style.transform = "translateX(-50%) rotate(" + angle + "deg)";
-      }
-    
 
     function updateBandPassFilter() {
         bandPassFilter.frequency.value = 300; // Change to suitable frequency based on your needs
