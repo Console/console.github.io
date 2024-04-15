@@ -53,7 +53,7 @@ input[type="number"] {
 }
 
 #challengeCompleteDisplay {
-    font-size: 48px; /* Large font for visibility */
+    font-size: 1.2em; /* Large font for visibility */
     color: green; /* Green color for the text */
     background-color: black; /* Black background for contrast */
     font-family: 'Digital-7', monospace; /* Font that mimics digital 7-segment displays */
