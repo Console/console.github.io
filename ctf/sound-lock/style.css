@@ -104,10 +104,10 @@ input[type="number"] {
   }
   #hand {
     position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform-origin: 50% 100%;
-    transform: translateX(-50%) rotate(0deg);
+    bottom: 50%; /* Position at the bottom of the dial */
+    left: 50%; /* Position at the horizontal center of the dial */
+    transform-origin: bottom center; /* Set the rotation origin to bottom center */
+    transform: translateX(-50%) rotate(0deg); /* Center horizontally and rotate */
     width: 2px;
     height: 100px;
     background-color: red;
