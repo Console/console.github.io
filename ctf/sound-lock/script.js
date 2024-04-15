@@ -119,7 +119,7 @@ window.onload = function() {
                 let matchDisplays = [firstMatchDisplay, secondMatchDisplay, thirdMatchDisplay];
                 let matchDisplay = matchDisplays[currentTargetIndex];
     
-                const frequencyDifference = Math.abs(averageFrequency - currentTargetFrequency);
+                const frequencyDifference = (averageFrequency - currentTargetFrequency);
                 document.getElementById('frequency').innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz (Difference: ${frequencyDifference.toFixed(2)} Hz)`;
                 updateDial(parseInt(frequencyDifference))
     
