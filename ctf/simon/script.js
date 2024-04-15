@@ -25,19 +25,46 @@ const colorFrequencies = {
     'blue': 523.25
 };
 
+function showModal(message) {
+    const modal = document.getElementById('modal');
+    const modalText = document.getElementById('modal-text');
+    modalText.textContent = message;
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+function checkLevelMilestones() {
+    switch(level) {
+        case 10:
+            showModal('Great job! You reached Level 10!');
+            break;
+        case 20:
+            showModal('Awesome! Level 20 mastered!');
+            break;
+        case 30:
+            showModal('Incredible! Level 30! Keep going!');
+            break;
+    }
+}
+
 function nextSequence() {
     if (!gameActive) return;
     userSequence = [];
     level++;
     document.getElementById('level-display').innerText = `Level: ${level}`;
+    checkLevelMilestones();
     const colors = ['green', 'red', 'yellow', 'blue'];
     sequence.push(colors[Math.floor(Math.random() * colors.length)]);
     sequence.forEach((color, index) => {
         setTimeout(() => {
-            document.getElementById(color).style.opacity = 1;
+            const colorElement = document.getElementById(color);
+            colorElement.classList.add('highlight');
             playSound(colorFrequencies[color]);
             setTimeout(() => {
-                document.getElementById(color).style.opacity = 0.8;
+                colorElement.classList.remove('highlight');
             }, 500);
         }, 1000 * index);
     });

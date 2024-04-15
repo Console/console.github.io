@@ -1,7 +1,7 @@
 body {
     background-color: black;
-    color: white; /* Ensures text is visible on a black background */
-    font-family: Arial, sans-serif; /* Improves readability */
+    color: white;
+    font-family: Arial, sans-serif;
 }
 
 #simon-game {
@@ -18,16 +18,19 @@ body {
     border-radius: 50%;
     cursor: pointer;
     opacity: 0.8;
-    border: 2px solid #333; /* Adds a subtle border for better visibility */
+    border: 2px solid #333;
+    transition: transform 0.2s, box-shadow 0.2s; /* Smooth transition for transformations */
 }
 
-#green { background-color: green; }
-#red { background-color: red; }
-#yellow { background-color: yellow; }
-#blue { background-color: blue; }
+#green { background-color: green; filter: brightness(1.2) saturate(1.5); }
+#red { background-color: red; filter: brightness(1.2) saturate(1.5); }
+#yellow { background-color: yellow; filter: brightness(1.2) saturate(1.5); }
+#blue { background-color: blue; filter: brightness(1.2) saturate(1.5); }
 
-.color-button:active {
+.color-button:active, .color-button.highlight {
     opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.75); /* White glow effect */
 }
 
 #control-panel {
@@ -37,4 +40,37 @@ body {
 
 #level-display {
     margin-top: 10px;
+}
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgba(0, 0, 0, 0.4); /* Black background with opacity */
+    z-index: 1000; /* Sit on top */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    text-align: center;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
