@@ -38,13 +38,13 @@ function closeModal() {
 
 function checkLevelMilestones() {
     switch(level) {
-        case 10:
+        case 1:
             showModal('Great job! You reached Level 10!');
             break;
-        case 20:
+        case 2:
             showModal('Awesome! Level 20 mastered!');
             break;
-        case 30:
+        case 3:
             showModal('Incredible! Level 30! Keep going!');
             break;
     }
