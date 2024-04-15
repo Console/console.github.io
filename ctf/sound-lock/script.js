@@ -83,7 +83,7 @@ window.onload = function() {
         if (isListening) {
             stopListening();
         }
-        document.getElementById('start').textContent = "Start Listening  ▶️"; // Reset start button text
+        document.getElementById('start').textContent = "Start ▶️"; // Reset start button text
         document.getElementById('frequency').innerText = "Frequency: -- Hz"; // Reset frequency display
     });
     
@@ -96,7 +96,7 @@ window.onload = function() {
         }
         isListening = false;
         clearInterval(countdownTimer);
-        document.getElementById('start').textContent = "Start Listening  ▶️";
+        document.getElementById('start').textContent = "Start ▶️";
         startButton.classList.remove('button-stop'); // Change button back to normal
     }
 

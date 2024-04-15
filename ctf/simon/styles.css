@@ -1,3 +1,9 @@
+body {
+    background-color: black;
+    color: white; /* Ensures text is visible on a black background */
+    font-family: Arial, sans-serif; /* Improves readability */
+}
+
 #simon-game {
     display: grid;
     grid-template-columns: repeat(2, 100px);
@@ -12,6 +18,7 @@
     border-radius: 50%;
     cursor: pointer;
     opacity: 0.8;
+    border: 2px solid #333; /* Adds a subtle border for better visibility */
 }
 
 #green { background-color: green; }
