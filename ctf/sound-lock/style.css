@@ -96,14 +96,15 @@ input[type="number"] {
 /*Hand Meter Stuff*/
 #dial {
     width: 200px;
-    height: 200px;
+    height: 100px; /* half the height of a full circle */
     border-radius: 50%;
-    border: 5px solid black;
+    border-top: 5px solid black; /* Only top border to make it hemispherical */
     position: relative;
+    overflow: hidden; /* to hide the lower half of the circle */
   }
   #hand {
     position: absolute;
-    top: 50%;
+    bottom: 0;
     left: 50%;
     transform-origin: 50% 100%;
     transform: translateX(-50%) rotate(0deg);

@@ -176,6 +176,8 @@ window.onload = function() {
     
     function updateDial(angle) {
         var angle = parseInt(angle);
+        // Apply ceiling function to bound angle within -180 to 180 range
+        angle = Math.min(Math.max(angle, -180), 180);
         var hand = document.getElementById("hand");
         hand.style.transform = "translateX(-50%) rotate(" + angle + "deg)";
       }
