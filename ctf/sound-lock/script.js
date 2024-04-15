@@ -95,9 +95,9 @@ window.onload = function() {
     function analyzeSound() {
         const dataArray = new Uint8Array(analyser.fftSize);
         const requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
-        const movingAverageSize = 10;  // Number of samples to average
+        const movingAverageSize = 100;  // Number of samples to average
         const recentFrequencies = [];  // Buffer to store recent frequency values
-        const debounceDelay = 100;  // Delay in milliseconds
+        const debounceDelay = 200;  // Delay in milliseconds
         let lastDebounceTime = 0;
     
         function update() {
@@ -121,6 +121,7 @@ window.onload = function() {
     
                 const frequencyDifference = Math.abs(averageFrequency - currentTargetFrequency);
                 document.getElementById('frequency').innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz (Difference: ${frequencyDifference.toFixed(2)} Hz)`;
+    
                 // Debouncing logic to avoid rapid matching
                 const currentTime = Date.now();
                 if (currentTime - lastDebounceTime > debounceDelay) {
@@ -173,7 +174,7 @@ window.onload = function() {
     }
 
     function updateBandPassFilter() {
-        bandPassFilter.frequency.value = 300; // hardcoded center frequency for the bandpass filter
+        bandPassFilter.frequency.value = 600; // hardcoded center frequency for the bandpass filter
         bandPassFilter.Q.value = 1.5; // hardcoded Q value for the bandpass filter
     }
 
