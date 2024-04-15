@@ -159,19 +159,18 @@ window.onload = function() {
             matchDisplay.innerText = "🟢 Target Frequency Matched, Target Duration Met";
             currentTargetIndex++;
             if (currentTargetIndex < targetFrequencies.length) {
-                matchDisplays[currentTargetIndex].style.display = "block"; // Ensure the next target display is visible
+                matchDisplays[currentTargetIndex].style.display = "block"; // Show the next target display
                 matchStartTime = null; // Reset start time for the next frequency matching
             } else {
                 matchDisplays.forEach(display => {
                     display.innerText = "🟢 Target Frequency Matched, Target Duration Met"; // Update all displays to show matched
                 });
-                challengeCompleteDisplay.innerHTML = "Challenge Completed<br/><span id='flagSpan'>flag{Canu_r_Dydd_a_Chanu_r_Nos}</span>";
+                challengeCompleteDisplay.innerHTML = "Challenge Completed<br/><span id=flagSpan>flag{Canu_r_Dydd_a_Chanu_r_Nos}</span>";
                 challengeCompleteDisplay.style.display = "block";
                 stopListening();
             }
         }
     }
-    
 
     function updateBandPassFilter() {
         bandPassFilter.frequency.value = 300; // hardcoded center frequency for the bandpass filter
