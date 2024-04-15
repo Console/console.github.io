@@ -92,23 +92,3 @@ input[type="number"] {
     font-size: 16px;
     cursor: pointer;
 }
-
-/*Hand Meter Stuff*/
-#dial {
-    width: 200px;
-    height: 100px; /* half the height of a full circle */
-    border-radius: 50%;
-    border-top: 5px solid black; /* Only top border to make it hemispherical */
-    position: relative;
-    overflow: hidden; /* to hide the lower half of the circle */
-  }
-  #hand {
-    position: absolute;
-    bottom: 50%; /* Position at the bottom of the dial */
-    left: 50%; /* Position at the horizontal center of the dial */
-    transform-origin: bottom center; /* Set the rotation origin to bottom center */
-    transform: translateX(-50%) rotate(0deg); /* Center horizontally and rotate */
-    width: 2px;
-    height: 100px;
-    background-color: red;
-  }
