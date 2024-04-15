@@ -27,22 +27,22 @@ const colorFrequencies = {
 
 function displayMessage(message) {
     const messageDisplay = document.getElementById('message-display');
-    messageDisplay.textContent = message;
-    setTimeout(() => {
-        messageDisplay.textContent = ''; // Clear message after a delay
-    }, 3000); // Message display duration
+    // Create a new paragraph for each message
+    let messageParagraph = document.createElement('p');
+    messageParagraph.textContent = message;
+    messageDisplay.appendChild(messageParagraph);  // Append the new message as a paragraph
 }
 
 function checkLevelMilestones() {
     switch(level) {
-        case 10:
-            displayMessage('Great job! You reached Level 10!');
+        case 3:
+            displayMessage('Here have a flag for your efforts. flag{Anything_you_can_do}');
             break;
-        case 20:
-            displayMessage('Awesome! Level 20 mastered!');
+        case 5:
+            displayMessage('Oooh... looks like you are good at this. flag{I_can_d0_better}');
             break;
-        case 30:
-            displayMessage('Incredible! Level 30! Keep going!');
+        case 7:
+            displayMessage('Amazing! You deserve this. Carry on if you wish but this is the last flag you will get flag{I_c4n_d0_anyt41ng_b3tt3r_th4n_y0u!');
             break;
     }
 }
