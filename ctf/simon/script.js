@@ -35,14 +35,14 @@ function displayMessage(message) {
 
 function checkLevelMilestones() {
     switch(level) {
-        case 3:
+        case 10:
             displayMessage('Here have a flag for your efforts. flag{Anything_you_can_do}');
             break;
-        case 5:
+        case 15:
             displayMessage('Oooh... looks like you are good at this. flag{I_can_d0_better}');
             break;
-        case 7:
-            displayMessage('Amazing! You deserve this. Carry on if you wish but this is the last flag you will get flag{I_c4n_d0_anyt41ng_b3tt3r_th4n_y0u!');
+        case 20:
+            displayMessage('Amazing! You deserve this. Carry on if you wish but this is the last flag you will get flag{I_c4n_d0_anyt41ng_b3tt3r_th4n_y0u!}');
             break;
     }
 }
