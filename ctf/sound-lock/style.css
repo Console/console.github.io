@@ -5,13 +5,6 @@ body {
     text-align: center;
 }
 
-#configPanel {
-    margin: 20px auto;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #fff;
-}
 button {
     padding: 10px 20px;
     font-size: 16px;
@@ -73,42 +66,3 @@ input[type="number"] {
     word-wrap: break-word; /* Ensure long strings do not overflow */
     max-width: 100%; /* Limit width to prevent overflow */
 }
-
-#countdownDisplay {
-    font-size: 48px; /* Large font for visibility */
-    color: red; /* Red color for the digits */
-    background-color: black; /* Black background to mimic digital displays */
-    font-family: 'Digital-7', monospace; /* Font that mimics digital 7-segment displays; ensure you have this font or similar */
-    display: inline-block;
-    padding: 10px;
-    margin: 20px 0;
-    border-radius: 5px;
-}
-
-/* Collapsible Panel */
-#configBtn {
-    margin: 10px;
-    padding: 5px 10px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-/*Hand Meter Stuff*/
-#dial {
-    width: 200px;
-    height: 100px; /* half the height of a full circle */
-    border-radius: 50%;
-    border-top: 5px solid black; /* Only top border to make it hemispherical */
-    position: relative;
-    overflow: hidden; /* to hide the lower half of the circle */
-  }
-  #hand {
-    position: absolute;
-    bottom: 50%; /* Position at the bottom of the dial */
-    left: 50%; /* Position at the horizontal center of the dial */
-    transform-origin: bottom center; /* Set the rotation origin to bottom center */
-    transform: translateX(-50%) rotate(0deg); /* Center horizontally and rotate */
-    width: 2px;
-    height: 100px;
-    background-color: red;
-  }
