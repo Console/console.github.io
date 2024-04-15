@@ -94,7 +94,7 @@ function stopResetGame() {
     sequence = [];
     level = 0;
     document.getElementById('level-display').innerText = "Level: 0";
-    document.getElementById('message-display').innerText = "";
+    document.getElementById('message-display').innerHTML = "";
 }
 
 document.addEventListener('DOMContentLoaded', () => {
