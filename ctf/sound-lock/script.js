@@ -121,6 +121,7 @@ window.onload = function() {
     
                 const frequencyDifference = Math.abs(averageFrequency - currentTargetFrequency);
                 document.getElementById('frequency').innerText = `Frequency: ${averageFrequency.toFixed(2)} Hz (Difference: ${frequencyDifference.toFixed(2)} Hz)`;
+                updateDial(parseInt(frequencyDifference))
     
                 // Debouncing logic to avoid rapid matching
                 const currentTime = Date.now();
@@ -172,6 +173,18 @@ window.onload = function() {
             }
         }
     }
+    
+    function updateDial(angle) {
+        var angle = parseInt(angle);
+        // Apply ceiling function to bound angle within -180 to 180 range
+        angle = Math.min(Math.max(angle, -180), 180);
+        var hand = document.getElementById("hand");
+        // Calculate the maximum rotation angle based on the hemispherical shape
+        var maxRotation = 90; // 90 degrees for a hemisphere
+        var rotation = (angle / 180) * maxRotation;
+        hand.style.transform = "translateX(-50%) rotate(" + rotation + "deg)";
+    }
+    
 
     function updateBandPassFilter() {
         bandPassFilter.frequency.value = 600; // hardcoded center frequency for the bandpass filter
