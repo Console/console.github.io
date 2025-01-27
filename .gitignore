@@ -4,5 +4,4 @@ _site
 .jekyll-metadata
 vendor
 ctf/.DS_Store
-ctf/sound-lock/script.bak
 ctf/simon/script.bak
