@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Frequency Tracking Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f0f0f0;
+      position: relative;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: #fff;
+    }
+    #startBtn {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px 40px;
+      font-size: 18px;
+      z-index: 10;
+      cursor: pointer;
+    }
+    #devToggleBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      font-size: 14px;
+      z-index: 11;
+      cursor: pointer;
+    }
+    /* Developer panel canvas is hidden by default */
+    #devCanvas {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      border: 1px solid #ccc;
+      display: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <button id="startBtn">Click to Start</button>
+  <button id="devToggleBtn">Developer Panel</button>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <canvas id="devCanvas" width="800" height="150"></canvas>
+  <script src="game.js"></script>
+</body>
+</html>

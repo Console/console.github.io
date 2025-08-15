@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mally Hunt — single‑file, self‑contained</title>
+  <style>
+    :root{
+      --bg: #0c0c0c; --panel:#141414; --ink:#e9e9e9; --muted:#a8a8a8; --acc:#e9e9e9;
+    }
+    html,body{height:100%}
+    body{margin:0; background:radial-gradient(1200px 800px at 70% -10%, #1a1a1a 0%, #0c0c0c 60%); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans;}
+    .wrap{display:flex; min-height:100%;}
+    .sidebar{width:320px; max-width: 94vw; background:rgba(20,20,20,.75); backdrop-filter: blur(8px); border-right:1px solid rgba(255,255,255,.06); padding:16px 18px; box-sizing:border-box}
+    .title{font-size:20px; font-weight:800; letter-spacing:.2px}
+    .sub{font-size:12px; color:var(--muted); margin-top:4px}
+    .panel{margin-top:14px; border:1px solid rgba(255,255,255,.08); border-radius:14px; overflow:hidden}
+    .panel h3{margin:0; padding:10px 12px; font-size:12px; font-weight:800; letter-spacing:.3px; background:rgba(255,255,255,.05)}
+    .panel .body{padding:12px}
+    .row{display:flex; gap:10px; align-items:center; margin:8px 0}
+    .row label{font-size:12px; color:var(--muted); width:110px}
+    .btn{appearance:none; border:0; background:linear-gradient(180deg, #2f2f2f, #1b1b1b); color:white; padding:10px 12px; border-radius:12px; font-weight:800; cursor:pointer; box-shadow: 0 8px 20px rgba(0,0,0,.35)}
+    .btn:active{transform: translateY(1px)}
+    .canvasWrap{flex:1; display:flex; align-items:center; justify-content:center; padding:18px; position:relative}
+    canvas{width:min(100%, 980px); height:auto; aspect-ratio:16/9; image-rendering: pixelated; border-radius:16px; background:#000; box-shadow:0 30px 70px rgba(0,0,0,.5), inset 0 0 120px rgba(255,255,255,.08)}
+    .hud{position:absolute; inset:18px 18px auto auto; pointer-events:none}
+    .tag{display:inline-block; margin-left:10px; padding:6px 10px; border-radius:999px; font-size:12px; background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.1)}
+    .footer{position:fixed; right:14px; bottom:12px; color:var(--muted); font-size:12px}
+    .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0c0e14; border:1px solid rgba(255,255,255,.12); padding:2px 6px; border-radius:8px}
+    .leader{font-size:12px}
+    .leader ol{margin:6px 0 0 18px; padding:0}
+    .leader li{margin:2px 0}
+    .invert-note{font-size:11px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="sidebar">
+      <div class="title">Mally Hunt</div>
+      <div class="sub">Black‑&‑white, Where's‑Wally‑style search. 30s per round, max 10 rounds.</div>
+
+      <div class="panel">
+        <h3>Game</h3>
+        <div class="body">
+          <button id="startBtn" class="btn">Start / Restart</button>
+          <div class="row"><label>Rounds:</label><span id="roundTxt">0 / 10</span></div>
+          <div class="row"><label>Score:</label><span id="scoreTxt">0</span></div>
+          <div class="row"><label>Theme:</label><span id="themeTxt">—</span></div>
+          <div class="row"><label>Time left:</label><span id="timeTxt">0</span></div>
+          <p class="invert-note">Every <b>10s</b> the scene <b>inverts</b>. Mouse controls are <b>inverted</b>. Find and click <b>Mally</b> to win a round.</p>
+        </div>
+      </div>
+
+      <div class="panel leader">
+        <h3>Bragging rights (local)</h3>
+        <div class="body">
+          <ol id="board"></ol>
+          <button id="clearBoard" class="btn">Clear leaderboard</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>How to play</h3>
+        <div class="body">
+          <p>Move your mouse — but remember, the cursor is mirrored! Click where you think <b>Mally</b> is. Everyone shuffles slowly. If you miss 30 seconds, the scene resets. 10 rounds max.</p>
+          <p><span class="kbd">Click</span> = select; <span class="kbd">Start</span> = new run.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="canvasWrap">
+      <canvas id="game" width="960" height="540"></canvas>
+      <div class="hud">
+        <span class="tag" id="hudRound">Round 0/10</span>
+        <span class="tag" id="hudTime">00</span>
+        <span class="tag" id="hudTheme">—</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer">Single‑file • No external assets</div>
+
+<script>
+(() => {
+  // ===== Utilities =====
+  const rand = (a,b)=>Math.random()*(b-a)+a;
+  const randi = (a,b)=>Math.floor(rand(a,b));
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+  // ===== Audio (buzzer that grows louder) =====
+  const Audio = (()=>{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const master = ctx.createGain();
+    master.gain.value = 0.2; master.connect(ctx.destination);
+
+    function beep(t, intensity){
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      // Increase frequency and volume with intensity (0..1)
+      osc.frequency.value = 400 + 600*intensity;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(0.05 + 0.25*intensity, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      osc.connect(gain).connect(master);
+      osc.start(now);
+      osc.stop(now + 0.13);
+    }
+
+    return {ctx, beep};
+  })();
+
+  // ===== Game State =====
+  const ROUND_TIME = 30; // seconds
+  const INVERT_EVERY = 10; // seconds
+  const MAX_ROUNDS = 10;
+  const PEOPLE_COUNT = 80; // crowd size
+
+  const THEMES = [
+    'Beach',
+    'Space',
+    'Medieval Castle Fête',
+    'City Park',
+    'Harbour Docks'
+  ];
+
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+
+  let state = {
+    round: 0,
+    score: 0,
+    timeLeft: ROUND_TIME,
+    running: false,
+    invert: false,
+    theme: THEMES[0],
+    crowd: [],
+    mallyId: -1,
+    lastTick: performance.now(),
+    lastInvertMark: 0,
+  };
+
+  // ===== Leaderboard (localStorage) =====
+  const BOARD_KEY = 'mallyHuntBoardV1';
+  const boardEl = document.getElementById('board');
+  function loadBoard(){
+    try{ return JSON.parse(localStorage.getItem(BOARD_KEY)||'[]'); }catch{ return []; }
+  }
+  function saveBoard(list){ localStorage.setItem(BOARD_KEY, JSON.stringify(list.slice(0,10))); }
+  function renderBoard(){
+    const list = loadBoard();
+    boardEl.innerHTML='';
+    list.forEach((e,i)=>{
+      const li = document.createElement('li');
+      li.textContent = `${i+1}. ${e.name} — ${e.score}`;
+      boardEl.appendChild(li);
+    })
+    if(list.length===0){
+      const li=document.createElement('li'); li.textContent='No scores yet — be the first!'; boardEl.appendChild(li);
+    }
+  }
+  renderBoard();
+  document.getElementById('clearBoard').onclick=()=>{localStorage.removeItem(BOARD_KEY); renderBoard();}
+
+  // ===== People generator (simple black & white stick figures) =====
+  function makeCrowd(theme){
+    const arr = [];
+    const count = PEOPLE_COUNT + randi(-5,5);
+    for(let i=0;i<count;i++){
+      arr.push({
+        id:i,
+        x: rand(20, canvas.width-20),
+        y: rand(40, canvas.height-40),
+        r: rand(7, 11), // body scale
+        vx: rand(-0.12, 0.12),
+        vy: rand(-0.12, 0.12),
+        tilt: rand(0,Math.PI*2),
+        shade: rand(0.15, 0.85), // grayscale shade
+        stripe: Math.random()<0.35,
+      });
+    }
+    return arr;
+  }
+
+  function chooseMally(crowd){
+    return randi(0, crowd.length);
+  }
+
+  // ===== Theme props (monochrome doodles) =====
+  function drawTheme(theme){
+    ctx.save();
+    ctx.globalAlpha = 0.12;
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#fff';
+    switch(theme){
+      case 'Beach':
+        // waves
+        for(let y=canvas.height*0.55;y<canvas.height;y+=16){
+          for(let x=-80;x<canvas.width+80;x+=80){
+            ctx.beginPath();
+            ctx.arc(x+(y%160), y, 60, Math.PI*0.1, Math.PI*0.9);
+            ctx.stroke();
+          }
+        }
+        // umbrellas
+        for(let i=0;i<10;i++){
+          const x=rand(40, canvas.width-40), y=rand(canvas.height*0.2, canvas.height*0.6);
+          ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+16); ctx.stroke();
+          ctx.beginPath(); ctx.arc(x,y,12,0,Math.PI,true); ctx.fill();
+        }
+        break;
+      case 'Space':
+        for(let i=0;i<200;i++){ ctx.fillRect(randi(0,canvas.width), randi(0,canvas.height), 1,1); }
+        // ringed planet
+        ctx.globalAlpha=0.08; ctx.beginPath(); ctx.arc(canvas.width*0.8, canvas.height*0.3, 40, 0, Math.PI*2); ctx.fill();
+        ctx.globalAlpha=0.15; ctx.beginPath(); ctx.ellipse(canvas.width*0.8, canvas.height*0.3, 70, 16, Math.PI/6, 0, Math.PI*2); ctx.stroke();
+        break;
+      case 'Medieval Castle Fête':
+        // banners
+        for(let x=40;x<canvas.width-40;x+=140){
+          ctx.beginPath(); ctx.moveTo(x,80); ctx.lineTo(x+60,80); ctx.stroke();
+          for(let i=0;i<6;i++){ ctx.beginPath(); ctx.moveTo(x+10*i,80); ctx.lineTo(x+10*i+5,92); ctx.lineTo(x+10*i+10,80); ctx.fill(); }
+        }
+        // walls
+        ctx.globalAlpha=0.08; ctx.fillRect(0, canvas.height-120, canvas.width, 120);
+        break;
+      case 'City Park':
+        // trees & paths
+        for(let i=0;i<12;i++){
+          const x=rand(30, canvas.width-30), y=rand(60, canvas.height-60);
+          ctx.beginPath(); ctx.arc(x,y,12,0,Math.PI*2); ctx.fill();
+          ctx.fillRect(x-1,y,2,16);
+        }
+        ctx.globalAlpha=0.06; ctx.fillRect(120, canvas.height*0.6, canvas.width-240, 40);
+        break;
+      case 'Harbour Docks':
+        // water lines
+        for(let y=canvas.height*0.65;y<canvas.height;y+=10){ ctx.fillRect(0,y,canvas.width,1); }
+        // cranes
+        for(let i=0;i<3;i++){
+          const x=canvas.width*(0.2+0.25*i);
+          ctx.globalAlpha=0.1; ctx.fillRect(x-3,120,6,120);
+          ctx.globalAlpha=0.14; ctx.beginPath(); ctx.moveTo(x-3,120); ctx.lineTo(x+60,80); ctx.lineTo(x+62,84); ctx.lineTo(x,126); ctx.closePath(); ctx.fill();
+        }
+        break;
+    }
+    ctx.restore();
+  }
+
+  function drawPerson(p, isMally){
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(Math.sin(p.tilt)*0.1);
+    const base = Math.floor(p.r);
+    ctx.strokeStyle = `rgba(255,255,255,${isMally?1:0.9})`;
+    ctx.fillStyle = `rgba(255,255,255,${p.shade})`;
+    // body
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0, base*2); ctx.stroke(); // torso
+    ctx.beginPath(); ctx.arc(0,-base*0.6, base*0.8, 0, Math.PI*2); ctx.stroke(); // head
+    // arms/legs
+    ctx.beginPath(); ctx.moveTo(0, base*0.5); ctx.lineTo(-base, base*1.2); ctx.moveTo(0, base*0.5); ctx.lineTo(base, base*1.2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, base*2); ctx.lineTo(-base*0.8, base*3); ctx.moveTo(0, base*2); ctx.lineTo(base*0.8, base*3); ctx.stroke();
+    // shirt pattern
+    if(p.stripe){
+      for(let y=-base;y<base*2;y+=4){ ctx.fillRect(-base, y, base*2, 1); }
+    }
+    // Mally hint: a small hat ring (still monochrome)
+    if(isMally){ ctx.beginPath(); ctx.ellipse(0, -base*0.6+2, base*0.9, 3, 0, 0, Math.PI*2); ctx.fill(); }
+    ctx.restore();
+  }
+
+  function step(dt){
+    // move people very slowly
+    for(const p of state.crowd){
+      p.x += p.vx * dt; p.y += p.vy * dt; p.tilt += 0.0015*dt;
+      if(p.x<12||p.x>canvas.width-12) p.vx*=-1;
+      if(p.y<20||p.y>canvas.height-20) p.vy*=-1;
+    }
+  }
+
+  function render(mouseInv){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // background shade
+    ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    // theme
+    drawTheme(state.theme);
+    // crowd
+    for(let i=0;i<state.crowd.length;i++){
+      drawPerson(state.crowd[i], i===state.mallyId);
+    }
+    // custom mirrored cursor
+    if(mouseInv){
+      ctx.save();
+      ctx.globalAlpha=0.9; ctx.strokeStyle='#fff'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(mouseInv.x, mouseInv.y, 10, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(mouseInv.x-14, mouseInv.y); ctx.lineTo(mouseInv.x+14, mouseInv.y); ctx.moveTo(mouseInv.x, mouseInv.y-14); ctx.lineTo(mouseInv.x, mouseInv.y+14); ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // invert effect via CSS filter toggled on canvas
+  function applyInvert(on){ canvas.style.filter = on? 'invert(1)': 'invert(0)'; }
+
+  // ===== Rounds =====
+  function newRound(){
+    state.round++;
+    if(state.round>MAX_ROUNDS){
+      endGame(true);
+      return;
+    }
+    state.timeLeft = ROUND_TIME;
+    state.theme = THEMES[randi(0, THEMES.length)];
+    state.crowd = makeCrowd(state.theme);
+    state.mallyId = chooseMally(state.crowd);
+    state.lastInvertMark = 0; state.invert=false; applyInvert(false);
+    tickUI();
+  }
+
+  function endGame(wonThrough){
+    state.running = false;
+    applyInvert(false);
+    // record score
+    const name = prompt('Run over! Enter a name for the board:', 'Player');
+    if(name){
+      const list = loadBoard();
+      list.push({name:name.slice(0,16), score: state.score});
+      list.sort((a,b)=>b.score-a.score);
+      saveBoard(list); renderBoard();
+    }
+  }
+
+  function startGame(){
+    state = {...state, score:0, round:0, timeLeft:ROUND_TIME, running:true, invert:false };
+    newRound();
+  }
+
+  // ===== Mouse (inverted controls) =====
+  let mouse = {x:0,y:0};
+  let mouseInv = {x:0,y:0};
+  canvas.addEventListener('mousemove', (e)=>{
+    const rect = canvas.getBoundingClientRect();
+    const sx = canvas.width/rect.width, sy = canvas.height/rect.height;
+    // actual in-canvas coords
+    const mx = (e.clientX-rect.left)*sx;
+    const my = (e.clientY-rect.top)*sy;
+    mouse.x=mx; mouse.y=my;
+    // mirrored over center
+    mouseInv.x = canvas.width - mx;
+    mouseInv.y = canvas.height - my;
+  });
+
+  canvas.addEventListener('click', ()=>{
+    if(!state.running) return;
+    // resolve click using inverted coordinates
+    const clickX = mouseInv.x, clickY = mouseInv.y;
+    const m = state.crowd[state.mallyId];
+    const dx = clickX - m.x, dy = clickY - m.y;
+    const hit = Math.hypot(dx,dy) < m.r*1.8 + 8;
+    if(hit){
+      // score based on remaining time and round
+      const gained = Math.floor(100 + state.timeLeft*10 + state.round*20);
+      state.score += gained;
+      flash('MALLY FOUND! +'+gained);
+      newRound();
+    } else {
+      flash('Miss!');
+    }
+    tickUI();
+  });
+
+  function flash(text){
+    const el = document.createElement('div');
+    el.textContent=text; el.style.position='absolute'; el.style.left='50%'; el.style.top='16px'; el.style.transform='translateX(-50%)'; el.style.background='rgba(0,0,0,.6)'; el.style.border='1px solid rgba(255,255,255,.2)'; el.style.padding='8px 12px'; el.style.borderRadius='999px'; el.style.fontWeight='800'; el.style.fontSize='12px'; el.style.pointerEvents='none';
+    document.body.appendChild(el);
+    setTimeout(()=>{ el.remove(); }, 900);
+  }
+
+  // ===== Loop & timer =====
+  function tickUI(){
+    document.getElementById('roundTxt').textContent = `${state.round} / ${MAX_ROUNDS}`;
+    document.getElementById('scoreTxt').textContent = state.score;
+    document.getElementById('themeTxt').textContent = state.theme;
+    document.getElementById('timeTxt').textContent = state.timeLeft.toFixed(0)+'s';
+    document.getElementById('hudRound').textContent = `Round ${state.round}/${MAX_ROUNDS}`;
+    document.getElementById('hudTime').textContent = state.timeLeft.toFixed(0)+'s';
+    document.getElementById('hudTheme').textContent = state.theme;
+  }
+
+  function update(now){
+    const dt = now - state.lastTick; state.lastTick = now;
+    if(state.running){
+      // time
+      state.timeLeft -= dt/1000;
+      const elapsed = ROUND_TIME - state.timeLeft;
+      // invert every 10s
+      const invSegment = Math.floor(elapsed / INVERT_EVERY);
+      if(invSegment !== state.lastInvertMark){
+        state.lastInvertMark = invSegment;
+        state.invert = !state.invert; applyInvert(state.invert);
+      }
+      // beeps each second, volume rises towards end
+      const t = Math.ceil(state.timeLeft);
+      if(t !== update.lastBeepFor){
+        update.lastBeepFor = t;
+        const intensity = clamp(1 - (state.timeLeft/ROUND_TIME), 0, 1); // grows from 0 to 1
+        try { Audio.beep(0, intensity); } catch{}
+      }
+      if(state.timeLeft<=0){
+        // timeout resets picture, same round number increases by 1 handled in newRound
+        flash('Time! Scene resets');
+        newRound();
+      }
+      step(dt);
+      tickUI();
+    }
+    render(mouseInv);
+    requestAnimationFrame(update);
+  }
+  update.lastBeepFor = null;
+
+  // ===== Controls =====
+  document.getElementById('startBtn').addEventListener('click', ()=>{
+    if(Audio.ctx.state==='suspended'){ Audio.ctx.resume(); }
+    startGame();
+  });
+
+  // boot
+  renderBoard();
+  tickUI();
+  requestAnimationFrame(ts=>{ state.lastTick=ts; requestAnimationFrame(update); });
+})();
+</script>
+</body>
+</html>
