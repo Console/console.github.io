@@ -21,6 +21,12 @@
     .btn{ pointer-events:auto; display:inline-block; margin-top:16px; color:#12141c; background: linear-gradient(180deg, #18f0ff, #8a2be2); border:none; border-radius:999px; padding:12px 18px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; box-shadow:0 10px 30px rgba(138,43,226,.4), 0 0 24px rgba(24,240,255,.45); }
     .btn:active{ transform:translateY(1px); }
     .bottomhelp{ font-size:12px; opacity:.8; }
+    .lb-list ol{margin:0;padding-left:18px}
+    .lb-item{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid rgba(138,43,226,.2)}
+    .lb-name{max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .lb-score{font-weight:800}
+    .lb-meta{opacity:.75;font-size:12px}
+
       :root {
     --hud-text: #ffffff;
     --hud-stroke: rgba(0,0,0,.75);     /* thin dark outline for contrast */
@@ -99,6 +105,24 @@
       <div style="margin-top:12px">Weapon Progression (by <em>destroyed</em> cat‑roids):
         <div class="bottomhelp">0: Peashooter → 10: Twin → 25: Spread → 50: Rapid → 80: Pulse Laser</div>
       </div>
+      <!-- Leaderboard (name + top scores) -->
+      <div class="lb" id="lbBlock" style="max-width:680px;margin:16px auto 0;text-align:left;">
+        <h3 style="margin:10px 0 8px;color:#c7f5ff;letter-spacing:.12em;text-transform:uppercase;font-size:13px;opacity:.9;">
+          Leaderboard
+        </h3>
+
+        <div class="lb-row" style="display:flex;gap:8px;align-items:center;">
+          <label for="playerName" class="bottomhelp" style="min-width:90px;">Your name</label>
+          <input id="playerName" maxlength="16" style="flex:1;min-width:140px;padding:8px 10px;border-radius:10px;border:1px solid rgba(138,43,226,.5);background:rgba(10,20,30,.24);color:var(--white);outline:none;">
+          <button id="saveNameBtn" class="btn" style="padding:8px 12px;">Save</button>
+          <button id="clearLbBtn" class="btn" style="padding:8px 12px;background:linear-gradient(180deg,#ff2f92,#8a2be2)">Clear</button>
+  </div>
+
+  <div id="leaderboard" class="lb-list" style="margin-top:8px;">
+    <!-- populated by JS -->
+  </div>
+</div>
+
       <button id="startBtn" class="btn">Start Game</button>
       <div class="bottomhelp" style="margin-top:10px;">Audio starts when you press Start. Tip: hold left mouse for autofire.</div>
     </div>
@@ -520,7 +544,8 @@ aimedSpread(count=5,spread=0.08,speed=300){
         homing:     HomingCat,
         rocket:     RocketCat,
         shield:     ShieldCat,
-        blackhole:  BlackHoleCat
+        blackhole:  BlackHoleCat,
+        boss:       BossCat
       };
     const C = map[(type+'').toLowerCase()];
     if (!C) return console.warn('Unknown type:', type);
@@ -667,15 +692,86 @@ for (const bh of game.blackholes) {if (bh.dead) continue;let dx = Math.abs(x - b
 
     function aoeDamage(x,y,r){ for(const a of game.asts){ if(a.dead) continue; const d=dist(x,y,a.x,a.y); if(d < r){ const scale = 1 + (r - d)/r; applyDamage(a, Math.ceil(scale*2)); } } }
 
-    function gameOver(){ game.paused=true; stopMusic(); overlay.style.display='flex'; titleEl.innerHTML='Game Over — <span style="color:var(--bad)">AstroCats Neon</span>'; subtitleEl.innerHTML=`Final Score: <strong>${game.score}</strong> • Cat-roids destroyed: <strong>${game.destroyed}</strong>`; startBtn.textContent='Play Again'; pauseBtn.setAttribute('aria-pressed','true'); pauseBtn.textContent='Paused';started = false; }
+    function gameOver(){ game.paused=true; stopMusic(); overlay.style.display='flex'; titleEl.innerHTML='Game Over — <span style="color:var(--bad)">AstroCats Neon</span>'; subtitleEl.innerHTML=`Final Score: <strong>${game.score}</strong> • Cat-roids destroyed: <strong>${game.destroyed}</strong>`; startBtn.textContent='Play Again'; pauseBtn.setAttribute('aria-pressed','true'); pauseBtn.textContent='Paused';started = false; const pname = JSON.parse(localStorage.getItem(NAME_KEY) || '""') || 'Anonymous';if (game.score > 0) addScore(pname, game.score, game.level, game.destroyed);renderLeaderboard();}
 
     // --- Backdrop ---
     function drawBackdrop(){ const w=window.innerWidth, h=window.innerHeight; ctx.save(); ctx.strokeStyle='rgba(138,43,226,0.08)'; ctx.lineWidth=1; ctx.shadowBlur=0; const step=40; ctx.beginPath(); for(let x=0;x<w;x+=step){ ctx.moveTo(x,0); ctx.lineTo(x,h); } for(let y=0;y<h;y+=step){ ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke(); const t=Date.now()*0.001; for(let i=0;i<60;i++){ const sx=(i*127.1)%w; const y=(i*83.3 + (t*10*i)%h)%h; const glow=(i%7===0)?10:6; ctx.beginPath(); ctx.fillStyle='rgba(24,240,255,0.2)'; ctx.shadowColor='#18f0ff'; ctx.shadowBlur=glow; ctx.arc(sx,y,1,0,TAU); ctx.fill(); } ctx.restore(); }
     function drawBossBar(){if(!game.bossActive || !game.boss) return;const b=game.boss, t=Math.max(0, Math.min(1, b.hp/(b.maxHp||1)));const w=Math.min(420, game.w*0.6), h=14, x=(game.w-w)/2, y=64;ctx.save();ctx.globalAlpha=0.95;ctx.fillStyle='rgba(0,0,0,0.45)'; ctx.fillRect(x,y,w,h);ctx.strokeStyle='rgba(138,43,226,0.6)'; ctx.lineWidth=2; ctx.strokeRect(x+0.5,y+0.5,w-1,h-1);ctx.fillStyle='#ff2f92'; ctx.fillRect(x,y,w*t,h);ctx.shadowColor='#18f0ff'; ctx.shadowBlur=8; ctx.font='12px ui-monospace, monospace'; ctx.fillStyle='#c7f5ff'; ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillText('BOSS', x+w/2, y-2); ctx.restore();}
     function drawLaserHeatBar(){const t = game.laserHeat || 0; const w = 160, h = 8, x = game.w - w - 18, y = 96; ctx.save();ctx.globalAlpha = 0.95; ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(x,y,w,h); ctx.strokeStyle='rgba(24,240,255,0.6)'; ctx.lineWidth=2; ctx.strokeRect(x+0.5,y+0.5,w-1,h-1); if (game.laserOverheated) {   ctx.fillStyle = '#ff2f92'; ctx.fillRect(x,y,w,h);   ctx.font='12px ui-monospace, monospace'; ctx.fillStyle='#c7f5ff'; ctx.textAlign='right'; ctx.textBaseline='bottom';   ctx.fillText('OVERHEAT', x+w, y-2); } else {   ctx.fillStyle = '#18f0ff'; ctx.fillRect(x,y,w*t,h);   ctx.font='12px ui-monospace, monospace'; ctx.fillStyle='#c7f5ff'; ctx.textAlign='right'; ctx.textBaseline='bottom';   ctx.fillText('LASER', x+w, y-2); } ctx.restore();}
+    
+    // --- Leaderboard (LocalStorage) ---
+const LB_KEY = 'acn_highscores_v1';
+const NAME_KEY = 'acn_player_name';
+
+function _lsGet(key, fallback=null){
+  try{ const v = localStorage.getItem(key); return v==null? fallback : JSON.parse(v); }
+  catch(e){ return fallback; }
+}
+function _lsSet(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); } catch(e){}
+}
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+function loadScores(){ return _lsGet(LB_KEY, []); }
+function saveScores(arr){ _lsSet(LB_KEY, arr.slice(0, 20)); }
+
+function addScore(name, score, level, destroyed){
+  const arr = loadScores();
+  const entry = {
+    name: (name||'Anonymous').slice(0,16),
+    score: Number(score)||0,
+    level: Number(level)||1,
+    destroyed: Number(destroyed)||0,
+    ts: Date.now()
+  };
+  arr.push(entry);
+  arr.sort((a,b)=> (b.score - a.score) || (a.ts - b.ts)); // score desc, older first on ties
+  saveScores(arr);
+  return arr;
+}
+
+function renderLeaderboard(){
+  const el = document.getElementById('leaderboard');
+  if(!el) return;
+  const list = loadScores().slice(0, 10);
+  if(list.length===0){
+    el.innerHTML = '<div class="bottomhelp">No scores yet — be the first!</div>';
+    return;
+  }
+  el.innerHTML =
+    '<ol style="margin:0;padding-left:18px;">' +
+      list.map((r,i)=> `
+        <li class="lb-item">
+          <span class="lb-name">${escapeHtml(r.name)}</span>
+          <span class="lb-score">${r.score}</span>
+          <span class="lb-meta">L${r.level}&nbsp;•&nbsp;${r.destroyed} KOs</span>
+        </li>`).join('') +
+    '</ol>';
+}
+    
     // --- UI wiring ---
     const toggleAudioBtn=document.getElementById('toggleAudio'); const toggleMusicBtn=document.getElementById('toggleMusic'); const pauseBtn=document.getElementById('pauseBtn'); const testStatus=document.getElementById('testStatus');
     const overlay=document.getElementById('startOverlay'); const startBtn=document.getElementById('startBtn'); const titleEl=overlay.querySelector('h1'); const subtitleEl=overlay.querySelector('.subtitle');
+// Leaderboard wiring
+const nameInput   = document.getElementById('playerName');
+const saveNameBtn = document.getElementById('saveNameBtn');
+const clearLbBtn  = document.getElementById('clearLbBtn');
+
+if (nameInput)  nameInput.value = (_lsGet(NAME_KEY, null) ?? localStorage.getItem(NAME_KEY) ?? '') || '';
+if (saveNameBtn) saveNameBtn.addEventListener('click', ()=>{
+  const v = (nameInput?.value || '').trim().slice(0,16);
+  try { localStorage.setItem(NAME_KEY, JSON.stringify(v)); } catch(e){}
+  renderLeaderboard();
+});
+if (clearLbBtn) clearLbBtn.addEventListener('click', ()=>{
+  try { localStorage.removeItem(LB_KEY); } catch(e){}
+  renderLeaderboard();
+});
+
+// initial render on load
+renderLeaderboard();
 
     function togglePause(){ game.paused=!game.paused; pauseBtn.setAttribute('aria-pressed', game.paused?'true':'false'); pauseBtn.textContent= game.paused? 'Paused':'Pause'; }
 
