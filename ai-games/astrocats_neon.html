@@ -333,6 +333,91 @@ class BlackHole {
       draw(){ drawCatFace(this.x,this.y,this.r,this.a); ctx.save(); ctx.strokeStyle='#111'; ctx.shadowColor='#8a2be2'; ctx.shadowBlur=14; ctx.beginPath(); ctx.arc(this.x,this.y,this.r*0.55,0,TAU); ctx.stroke(); ctx.restore(); }
     }
 
+    class BossCat extends ArmoredCat {
+  constructor(g,x,y){
+    super(g,x,y,3, 0.6, 60);            // slow base, lots of HP
+    this.type='boss';
+    this.r=70;
+    this.maxHp=this.hp;
+    this.shootTimer=1.8;
+    this.pattern=0;
+    this.summonTimer=6.0;
+    g.boss=this; g.bossActive=true;
+  }
+  split(){ return []; }                  // no splitting
+
+  update(dt){
+    // Face ship + light drift so it doesn't sit still
+    if(this.g.ship){
+      const dx=this.g.ship.x-this.x, dy=this.g.ship.y-this.y;
+      const ang=Math.atan2(dy,dx); this.a=ang;
+      const accel=20; this.vx += Math.cos(ang)*accel*dt*0.2; this.vy += Math.sin(ang)*accel*dt*0.2;
+      const max=120; const sp=Math.hypot(this.vx,this.vy); if(sp>max){ this.vx*=max/sp; this.vy*=max/sp; }
+    }
+    super.update(dt);
+
+    // Attack cycle
+    this.shootTimer-=dt;
+    if(this.shootTimer<=0){
+      this.shootTimer=1.8;
+      this.pattern=(this.pattern+1)%3;
+      if(this.pattern===0) this.ringBurst(16,260);         // radial ring
+      else if(this.pattern===1) this.aimedSpread(5,0.08,300); // cone at player
+      else this.rocketVolley(2);                           // 2 rockets
+    }
+
+    // Summon support
+    this.summonTimer-=dt;
+    if(this.summonTimer<=0){
+      this.summonTimer=8+Math.random()*4;
+      for(let i=0;i<2;i++){
+        const ang=Math.random()*TAU, d=this.r+80+Math.random()*60;
+        const x=this.x+Math.cos(ang)*d, y=this.y+Math.sin(ang)*d;
+        const r=Math.random();
+        if(r<0.4) this.g.asts.push(new CometCat(this.g,x,y));
+        else if(r<0.7) this.g.asts.push(new HomingCat(this.g,x,y));
+        else this.g.asts.push(new ShooterCat(this.g,x,y));
+      }
+    }
+  }
+
+  ringBurst(n=12,speed=240){
+    for(let i=0;i<n;i++){
+      const a=(i/n)*TAU;
+      this.g.enemyBullets.push(new EnemyBullet(this.g,this.x,this.y,a,speed,2.2));
+    }
+    beep({type:'square',freq:200,time:0.08,gain:0.2});
+  }
+  aimedSpread(count=5,spread=0.08,speed=300){
+    if(!this.g.ship) return;
+    const base=Math.atan2(this.g.ship.y-this.y, this.g.ship.x-this.x);
+    const start=-spread*(count-1)/2;
+    for(let i=0;i<count;i++){
+      const a=base+start+spread*i;
+      this.g.enemyBullets.push(new EnemyBullet(this.g,this.x,this.y,a,speed,2.0));
+    }
+    beep({type:'square',freq:260,time:0.07,gain:0.22});
+  }
+  rocketVolley(n=2){
+    if(!this.g.ship) return;
+    for(let i=0;i<n;i++){
+      const t=Math.atan2(this.g.ship.y-this.y, this.g.ship.x-this.x)+(Math.random()*0.2-0.1);
+      this.g.enemyMissiles.push(new EnemyRocket(this.g,this.x,this.y,t));
+    }
+    noiseSplash(0.12,0.22);
+  }
+
+  draw(){
+    // beefy aura
+    drawCatFace(this.x,this.y,this.r,this.a);
+    ctx.save();
+    ctx.strokeStyle='#c7f5ff'; ctx.shadowColor='#c7f5ff'; ctx.shadowBlur=18; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.r*1.1,0,TAU); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+
     // Rocket Pickup
     class Pickup{ constructor(x,y){ this.x=x; this.y=y; this.r=10; this.life=12; this.spin=Math.random()*TAU; }
       update(dt){ this.life-=dt; this.spin+=dt*4; if(this.life<=0) this.dead=true; }
@@ -342,7 +427,7 @@ class BlackHole {
     function drawCatFace(x,y,r,rot=0){ ctx.save(); ctx.translate(x,y); ctx.rotate(rot); const color='#ff2f92'; ctx.lineWidth=2; ctx.strokeStyle=color; ctx.shadowColor=color; ctx.shadowBlur=18; ctx.beginPath(); ctx.arc(0,0,r*0.86,0,TAU); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-r*0.38,-r*0.35); ctx.lineTo(-r*0.7,-r*0.95); ctx.lineTo(-r*0.08,-r*0.62); ctx.closePath(); ctx.moveTo(r*0.38,-r*0.35); ctx.lineTo(r*0.7,-r*0.95); ctx.lineTo(r*0.08,-r*0.62); ctx.closePath(); ctx.stroke(); ctx.beginPath(); ctx.arc(-r*0.28,-r*0.05,r*0.10,0,TAU); ctx.moveTo(r*0.18,-r*0.05); ctx.arc(r*0.28,-r*0.05,r*0.10,0,TAU); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,r*0.02); ctx.lineTo(-r*0.06,r*0.12); ctx.lineTo(r*0.06,r*0.12); ctx.closePath(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-r*0.06,r*0.12); ctx.quadraticCurveTo(0,r*0.22,r*0.06,r*0.12); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-r*0.86,r*0.04); ctx.lineTo(-r*0.32,r*0.02); ctx.moveTo(-r*0.86,r*0.16); ctx.lineTo(-r*0.32,r*0.12); ctx.moveTo(r*0.86,r*0.04); ctx.lineTo(r*0.32,r*0.02); ctx.moveTo(r*0.86,r*0.16); ctx.lineTo(r*0.32,r*0.12); ctx.stroke(); ctx.restore(); }
 
     // --- Game state ---
-    const game={ w:window.innerWidth, h:window.innerHeight, bullets:[], enemyBullets:[], enemyMissiles:[], missiles:[], flames:[], asts:[], parts:[], pickups:[], blackholes:[], ship:null, score:0, lives:3, missilesLeft:0, weaponStage:0, destroyed:0, paused:true, fireCap:6, level:1, blackHoleCatAdded:false };
+    const game={ w:window.innerWidth, h:window.innerHeight, bullets:[], enemyBullets:[], enemyMissiles:[], missiles:[], flames:[], asts:[], parts:[], pickups:[], blackholes:[], boss:null, bossActive:false, ship:null, score:0, lives:3, missilesLeft:0, weaponStage:0, destroyed:0, paused:true, fireCap:6, level:1, blackHoleCatAdded:false };
     window.game=game;
 
     // Debug helpers — expose spawners to the console
@@ -371,6 +456,15 @@ window.addLives = (n=1) => {
 };
 
     function spawnWave(){
+      if (game.level % 5 === 0) {
+        let x,y; do{ x=rnd(0,game.w); y=rnd(0,game.h);} while(game.ship && dist(x,y, game.ship.x, game.ship.y) < 300);
+        const boss = new BossCat(game,x,y);
+        game.asts.push(boss);
+        game.bossActive = true;
+        game.boss = boss;
+        game.blackHoleCatAdded = true; // suppress black-hole cat on boss levels
+        return; // no regular spawns this wave
+      }
       const diff=game.destroyed; const speedMul = 1 + Math.min(0.6, diff/120);
       const armoredChance = Math.min(0.4, 0.06 + diff/140);
       const shooterChance = Math.min(0.30, 0.05 + diff/160);
@@ -411,9 +505,9 @@ window.addLives = (n=1) => {
       document.getElementById('stage').textContent = `Stage: ${names[clamp(game.weaponStage,0,4)]}`;
     }
 
-    function destroyAsteroid(a){ a.dead=true; explode(a.x,a.y,'#ff2f92'); game.score += a.size===3?20: a.size===2?50:100; game.destroyed++; if(a.spawnBlackHole){ game.blackholes.push(new BlackHole(a.x,a.y)); } if(Math.random()<0.10){ game.pickups.push(new Pickup(a.x,a.y)); } updateProgression(); updateHUD(); const kids = (a.split? a.split(): []); for(const na of kids) game.asts.push(na); }
+    function destroyAsteroid(a){ a.dead=true; explode(a.x,a.y,'#ff2f92'); if (a.type === 'boss') { game.score += 3000; game.lives += 2; game.missilesLeft += 6; game.bossActive = false; game.boss = null; updateHUD(); } else { game.score += a.size===3?20 : a.size===2?50 : 100; } game.destroyed++; if(a.spawnBlackHole){ game.blackholes.push(new BlackHole(a.x,a.y)); }  if(Math.random()<0.10){ game.pickups.push(new Pickup(a.x,a.y)); } updateProgression(); updateHUD(); const kids = (a.split? a.split(): []); for(const na of kids) game.asts.push(na);}
 
-    function applyDamage(a,dmg=1){ if(a.dead) return; if(a.type==='armored' && typeof a.hp==='number'){ a.hp -= dmg; game.parts.push(new Particle(a.x,a.y, Math.random()*TAU, 120, 0.25, '#fffb00')); if(a.hp<=0) destroyAsteroid(a); } else destroyAsteroid(a); }
+    function applyDamage(a,dmg=1){if(a.dead) return; if (typeof a.hp === 'number') { a.hp -= dmg; game.parts.push(new Particle(a.x,a.y, Math.random()*TAU, 120, 0.25, '#fffb00')); if(a.hp <= 0) destroyAsteroid(a); } else { destroyAsteroid(a);  }}
 
     function shieldBlocks(a, bullet){ if(a.type!=='shield') return false; let ba; if(bullet.laser){ if(!game.ship) return false; ba=bullet.a; } else { ba=Math.atan2(bullet.vy, bullet.vx); } let diff=( (ba - a.shieldAng + TAU) % TAU ); if(diff>Math.PI) diff=TAU-diff; return diff <= a.arc/2; }
 
@@ -475,6 +569,7 @@ for (const bh of game.blackholes) {if (bh.dead) continue;let dx = Math.abs(x - b
 
     // --- Backdrop ---
     function drawBackdrop(){ const w=window.innerWidth, h=window.innerHeight; ctx.save(); ctx.strokeStyle='rgba(138,43,226,0.08)'; ctx.lineWidth=1; ctx.shadowBlur=0; const step=40; ctx.beginPath(); for(let x=0;x<w;x+=step){ ctx.moveTo(x,0); ctx.lineTo(x,h); } for(let y=0;y<h;y+=step){ ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke(); const t=Date.now()*0.001; for(let i=0;i<60;i++){ const sx=(i*127.1)%w; const y=(i*83.3 + (t*10*i)%h)%h; const glow=(i%7===0)?10:6; ctx.beginPath(); ctx.fillStyle='rgba(24,240,255,0.2)'; ctx.shadowColor='#18f0ff'; ctx.shadowBlur=glow; ctx.arc(sx,y,1,0,TAU); ctx.fill(); } ctx.restore(); }
+    function drawBossBar(){if(!game.bossActive || !game.boss) return;const b=game.boss, t=Math.max(0, Math.min(1, b.hp/(b.maxHp||1)));const w=Math.min(420, game.w*0.6), h=14, x=(game.w-w)/2, y=22;ctx.save();ctx.globalAlpha=0.95;ctx.fillStyle='rgba(0,0,0,0.45)'; ctx.fillRect(x,y,w,h);ctx.strokeStyle='rgba(138,43,226,0.6)'; ctx.lineWidth=2; ctx.strokeRect(x+0.5,y+0.5,w-1,h-1);ctx.fillStyle='#ff2f92'; ctx.fillRect(x,y,w*t,h);ctx.shadowColor='#18f0ff'; ctx.shadowBlur=8; ctx.font='12px ui-monospace, monospace'; ctx.fillStyle='#c7f5ff'; ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillText('BOSS', x+w/2, y-2); ctx.restore();}
 
     // --- UI wiring ---
     const toggleAudioBtn=document.getElementById('toggleAudio'); const toggleMusicBtn=document.getElementById('toggleMusic'); const pauseBtn=document.getElementById('pauseBtn'); const testStatus=document.getElementById('testStatus');
@@ -543,6 +638,7 @@ for (const bh of game.blackholes) {if (bh.dead) continue;let dx = Math.abs(x - b
       for(const f of game.flames) f.draw();
       for(const pk of game.pickups) pk.draw();
       if(game.ship) game.ship.draw();
+      if(game.bossActive && game.boss) drawBossBar();
       requestAnimationFrame(tick);
     }
     // Boot
