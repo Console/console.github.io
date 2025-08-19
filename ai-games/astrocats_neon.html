@@ -421,7 +421,39 @@ window.addLives = (n=1) => {
       for(const b of game.bullets){ if(b.dead) continue; for(const a of game.asts){ if(a.dead) continue; if(b.laser){ if(!game.ship) continue; const L=Math.max(game.w,game.h); const sx=game.ship.x, sy=game.ship.y, ex=sx+Math.cos(b.a)*L, ey=sy+Math.sin(b.a)*L; if(segPointDist(sx,sy,ex,ey, a.x,a.y) <= a.r){ if(shieldBlocks(a,b)){ b.dead=true; game.parts.push(new Particle(a.x,a.y, a.shieldAng, 60, 0.25, '#18f0ff')); continue; } b.dead=true; applyDamage(a,2);} } else { if(dist(b.x,b.y,a.x,a.y)<a.r){ if(shieldBlocks(a,b)){ b.dead=true; game.parts.push(new Particle(a.x,a.y, a.shieldAng, 60, 0.25, '#18f0ff')); continue; } b.dead=true; applyDamage(a,1); } } } }
       if(game.ship && game.ship.inv<=0){ for(const eb of game.enemyBullets){ if(eb.dead) continue; if(dist(eb.x,eb.y, game.ship.x, game.ship.y) < game.ship.r){ eb.dead=true; game.lives--; updateHUD(); bumpMusicTempo(); explode(game.ship.x,game.ship.y,'#00ffa6'); if(game.lives<=0) { gameOver(); } else { game.ship.reset(); } } } }
       if(game.ship && game.ship.inv<=0){ for(const er of game.enemyMissiles){ if(er.dead) continue; if(dist(er.x,er.y, game.ship.x, game.ship.y) < game.ship.r+6){ er.dead=true; bumpMusicTempo(); explode(game.ship.x,game.ship.y,'#00ffa6'); game.lives--; updateHUD(); if(game.lives<=0) gameOver(); else game.ship.reset(); } } }
-      for(const m of game.missiles){ if(m.dead) continue; for(const a of game.asts){ if(a.dead) continue; if(dist(m.x,m.y,a.x,a.y) < a.r+8){ m.dead=true; missileExplode(m.x,m.y); beep({type:'sawtooth',freq:120,time:0.18,gain:0.25,pitchDecay:0.5}); break; } } }
+      for (const m of game.missiles) {
+        if (m.dead) continue;
+
+          // 1) Rocket vs Black Hole (direct impact)
+          let hitBH = false;
+            for (const bh of game.blackholes) {
+              if (bh.dead) continue;
+                // wrap-aware distance
+                let dx = Math.abs(m.x - bh.x), dy = Math.abs(m.y - bh.y);
+                dx = dx > game.w * 0.5 ? game.w - dx : dx;
+                dy = dy > game.h * 0.5 ? game.h - dy : dy;
+                if (Math.hypot(dx, dy) < bh.r) {
+                  m.dead = true;
+                  missileExplode(m.x, m.y);
+                  beep({type:'sawtooth',freq:120,time:0.18,gain:0.25,pitchDecay:0.5});
+                  hitBH = true;
+                  break;
+                }
+              }
+              if (hitBH) continue;
+
+                // 2) Rocket vs Cat-roids (existing)
+                for (const a of game.asts) {
+                  if (a.dead) continue;
+                  if (dist(m.x, m.y, a.x, a.y) < a.r + 8) {
+                    m.dead = true;
+                    missileExplode(m.x, m.y);
+                    beep({type:'sawtooth',freq:120,time:0.18,gain:0.25,pitchDecay:0.5});
+                    break;
+                  }
+                }
+        }
+
       if(game.ship && game.ship.inv<=0){ for(const bh of game.blackholes){ if(bh.dead) continue; if(dist(game.ship.x,game.ship.y,bh.x,bh.y) < (bh.r + game.ship.r*0.4)){ bumpMusicTempo(); explode(game.ship.x,game.ship.y,'#00ffa6'); game.lives--; updateHUD(); if(game.lives<=0){ gameOver(); } else { game.ship.reset(); } } } }
       for(const f of game.flames){ for(const a of game.asts){ if(a.dead) continue; if(dist(f.x,f.y,a.x,a.y) < f.r + a.r*0.2){ applyDamage(a,1); } } }
       if(game.ship){ for(const p of game.pickups){ if(p.dead) continue; if(dist(game.ship.x,game.ship.y,p.x,p.y) < game.ship.r + p.r){ p.dead=true; game.missilesLeft += 2; updateHUD(); }
@@ -434,7 +466,8 @@ window.addLives = (n=1) => {
 
     function fireMissile(){ if(game.missilesLeft<=0 || !game.ship) return; game.missilesLeft--; updateHUD(); game.missiles.push(new Missile(game)); noiseSplash(0.12,0.2); }
 
-    function missileExplode(x,y){ explode(x,y,'#ff7b00'); aoeDamage(x,y,88); for(const bh of game.blackholes){ if(bh.dead) continue; if(dist(x,y,bh.x,bh.y) < 88 + (bh.r*0.5)){ bh.dead=true; } } for(let i=0;i<3;i++){ const ang=rnd(0,TAU), d=rnd(10,40); const fx=x+Math.cos(ang)*d, fy=y+Math.sin(ang)*d; game.flames.push(new Flame(fx,fy,rnd(28,46), rnd(0.8,1.6))); } }
+    function missileExplode(x,y){ explode(x,y,'#ff7b00'); aoeDamage(x,y,88); 
+for (const bh of game.blackholes) {if (bh.dead) continue;let dx = Math.abs(x - bh.x), dy = Math.abs(y - bh.y);dx = dx > game.w * 0.5 ? game.w - dx : dx;dy = dy > game.h * 0.5 ? game.h - dy : dy;if (Math.hypot(dx, dy) < 88 + bh.r) {bh.dead = true;}}for(let i=0;i<3;i++){ const ang=rnd(0,TAU), d=rnd(10,40); const fx=x+Math.cos(ang)*d, fy=y+Math.sin(ang)*d; game.flames.push(new Flame(fx,fy,rnd(28,46), rnd(0.8,1.6))); } }
 
     function aoeDamage(x,y,r){ for(const a of game.asts){ if(a.dead) continue; const d=dist(x,y,a.x,a.y); if(d < r){ const scale = 1 + (r - d)/r; applyDamage(a, Math.ceil(scale*2)); } } }
 
