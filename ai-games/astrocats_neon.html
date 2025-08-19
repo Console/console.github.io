@@ -184,7 +184,7 @@
 
   // Laser heat cooling
   if (this.g.laserHeat > 0) {
-    const cool = this.g.laserOverheated ? 0.35 : 0.6;      // slower when overheated
+    const cool = this.g.laserOverheated ? 0.15 : 0.3;      // slower when overheated
     this.g.laserHeat = Math.max(0, this.g.laserHeat - cool*dt);
     if (this.g.laserOverheated && this.g.laserHeat <= 0.25) this.g.laserOverheated = false;
   }
