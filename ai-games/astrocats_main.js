@@ -734,27 +734,41 @@ async function loadInstrument(name){
   }
 }
 
-// Coarse GM program# -> soundfont-player preset name
 function gmNameFromProgram(p){
-  if (p==null) return 'acoustic_grand_piano';
+  // Common GM patches your four tracks will use
+  const map = {
+    0:'acoustic_grand_piano',
+    4:'electric_piano_1',
+    16:'drawbar_organ',
+    24:'acoustic_guitar_nylon',
+    28:'electric_guitar_clean',
+    29:'overdriven_guitar',
+    30:'distortion_guitar',
+    33:'electric_bass_finger',
+    48:'string_ensemble_1',
+    56:'trumpet',
+    60:'french_horn',
+    61:'brass_section',
+    62:'synth_brass_1',
+    80:'lead_1_square',
+    81:'lead_2_sawtooth',
+    88:'pad_1_new_age',
+    118:'synth_drum'
+  };
+  // fallback by rough family if unmapped exact
+  if (map[p] ) return map[p];
   if (p<8)  return 'acoustic_grand_piano';
   if (p<16) return 'electric_piano_1';
-  if (p<24) return 'drawbar_organ';
   if (p<32) return 'acoustic_guitar_nylon';
   if (p<40) return 'electric_guitar_clean';
   if (p<48) return 'electric_bass_finger';
   if (p<56) return 'string_ensemble_1';
   if (p<64) return 'trumpet';
-  if (p<72) return 'soprano_sax';
-  if (p<80) return 'lead_1_square';
-  if (p<88) return 'synth_brass_1';
+  if (p<72) return 'lead_2_sawtooth';
+  if (p<80) return 'synth_brass_1';
   if (p<96) return 'pad_1_new_age';
-  if (p<104) return 'fx_1_rain';
-  if (p<112) return 'sitar';
-  if (p<120) return 'synth_drum';
   return 'acoustic_grand_piano';
 }
-
 // Read Program Change events from the parsed MIDI and preload instruments.
 // Uses MidiPlayerJS to parse; falls back harmlessly if structure differs.
 async function prescanAndPreloadInstruments(arrayBuffer){
@@ -826,16 +840,29 @@ async function playMidi(url){
     await prescanAndPreloadInstruments(buf);
 
 const player = new MP.Player((evt) => {
-      if (evt.name === 'Note on' && evt.velocity > 0) {
-        const note = evt.noteName || 'A4';
-        const vel  = Math.max(0, Math.min(1, (evt.velocity||80)/127));
-        const gain = 0.12 + vel*0.23; // ~0.12–0.35
-        // Pick instrument per channel if we have one, else fallback
-        const ch = (evt.channel ?? 0)|0;
-        const instToUse = (jb.chanInst && jb.chanInst[ch]) || inst;
-        if (instToUse) instToUse.play(note, AC.currentTime, { gain, duration: 0.30 });
-      }
-    });
+  const name = evt.name || evt.type;
+
+  // Apply live Program Change events (covers mid-song patch swaps)
+  if (name === 'Program Change') {
+    const ch   = (evt.channel ?? 0)|0;
+    const prog = (evt.value ?? evt.programNumber ?? evt.program ?? 0)|0;
+    const patchName = (ch === 9) ? 'synth_drum' : gmNameFromProgram(prog);
+    // Preloaded by prescan, but load on-the-fly if a new patch appears mid-track
+    loadInstrument(patchName).then(inst2 => { if (inst2) jb.chanInst[ch] = inst2; });
+    return;
+  }
+
+  // Notes
+  if (name === 'Note on' && evt.velocity > 0) {
+    const note = evt.noteName || 'A4';
+    const vel  = Math.max(0, Math.min(1, (evt.velocity||80)/127));
+    const gain = 0.12 + vel*0.23; // ~0.12–0.35
+    const ch   = (evt.channel ?? 0)|0;
+    const instToUse = (jb.chanInst && jb.chanInst[ch]) || inst; // channel patch or fallback
+    if (instToUse) instToUse.play(note, AC.currentTime, { gain, duration: 0.30 });
+  }
+});
+
 
     player.loadArrayBuffer(buf);
     player.on('endOfFile', ()=>{
