@@ -561,7 +561,7 @@ for (const bh of game.blackholes) {if (bh.dead) continue;let dx = Math.abs(x - b
 
     function aoeDamage(x,y,r){ for(const a of game.asts){ if(a.dead) continue; const d=dist(x,y,a.x,a.y); if(d < r){ const scale = 1 + (r - d)/r; applyDamage(a, Math.ceil(scale*2)); } } }
 
-    function gameOver(){ overlay.dataset.state='gameover'; game.paused=true; stopMusic(); overlay.style.display='flex'; titleEl.innerHTML='Game Over — <span style="color:var(--bad)">AstroCats Neon</span>'; subtitleEl.innerHTML=`Final Score: <strong>${game.score}</strong> • Cat-roids destroyed: <strong>${game.destroyed}</strong>`; startBtn.textContent='Play Again'; pauseBtn.setAttribute('aria-pressed','true'); pauseBtn.textContent='Paused';started = false; const pname = JSON.parse(localStorage.getItem(NAME_KEY) || '""') || 'Anonymous';if (game.score > 0) addScore(pname, game.score, game.level, game.destroyed);renderLeaderboard();}
+    function gameOver(){ overlay.dataset.state='gameover'; game.paused=true; stopMusic(); overlay.style.display='flex'; titleEl.innerHTML='Game Over — <span style="color:var(--bad)">AstroCats Neon</span>'; subtitleEl.innerHTML=`Final Score: <strong>${game.score}</strong> • Cat-roids destroyed: <strong>${game.destroyed}</strong>`; startBtn.textContent='Play Again'; pauseBtn.setAttribute('aria-pressed','true'); pauseBtn.textContent='Paused';started = false; const pname = JSON.parse(localStorage.getItem(NAME_KEY) || '""') || 'Anonymous';const ts = Date.now();if (game.score > 0) addScore(pname, game.score, game.level, game.destroyed, ts);window._lastScoreTs = ts;renderLeaderboard();}
 
     // --- Backdrop ---
     function drawBackdrop(){ const w=window.innerWidth, h=window.innerHeight; ctx.save(); ctx.strokeStyle='rgba(138,43,226,0.08)'; ctx.lineWidth=1; ctx.shadowBlur=0; const step=40; ctx.beginPath(); for(let x=0;x<w;x+=step){ ctx.moveTo(x,0); ctx.lineTo(x,h); } for(let y=0;y<h;y+=step){ ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke(); const t=Date.now()*0.001; for(let i=0;i<60;i++){ const sx=(i*127.1)%w; const y=(i*83.3 + (t*10*i)%h)%h; const glow=(i%7===0)?10:6; ctx.beginPath(); ctx.fillStyle='rgba(24,240,255,0.2)'; ctx.shadowColor='#18f0ff'; ctx.shadowBlur=glow; ctx.arc(sx,y,1,0,TAU); ctx.fill(); } ctx.restore(); }
@@ -586,14 +586,15 @@ function escapeHtml(s){
 function loadScores(){ return _lsGet(LB_KEY, []); }
 function saveScores(arr){ _lsSet(LB_KEY, arr.slice(0, 20)); }
 
-function addScore(name, score, level, destroyed){
+function addScore(name, score, level, destroyed, ts){
   const arr = loadScores();
   const entry = {
     name: (name||'Anonymous').slice(0,16),
     score: Number(score)||0,
     level: Number(level)||1,
     destroyed: Number(destroyed)||0,
-    ts: Date.now()
+    ts: (typeof ts === 'number' ? ts : Date.now())
+
   };
   arr.push(entry);
   arr.sort((a,b)=> (b.score - a.score) || (a.ts - b.ts)); // score desc, older first on ties
@@ -633,7 +634,17 @@ const clearLbBtn  = document.getElementById('clearLbBtn');
 if (nameInput)  nameInput.value = (_lsGet(NAME_KEY, null) ?? localStorage.getItem(NAME_KEY) ?? '') || '';
 if (saveNameBtn) saveNameBtn.addEventListener('click', ()=>{
   const v = (nameInput?.value || '').trim().slice(0,16);
+  // persist preferred name for future runs
   try { localStorage.setItem(NAME_KEY, JSON.stringify(v)); } catch(e){}
+  // if we just finished a game, also rename the most recent submitted score
+  if (window._lastScoreTs) {
+    const arr = loadScores();
+    const i = arr.findIndex(r => r.ts === window._lastScoreTs);
+    if (i !== -1) {
+      arr[i].name = v || 'Anonymous';
+      saveScores(arr);
+    }
+  }
   renderLeaderboard();
 });
 if (clearLbBtn) clearLbBtn.addEventListener('click', ()=>{
@@ -655,6 +666,7 @@ renderLeaderboard();
     function startGame(){
       if(started) return; started=true;
       overlay.style.display='none';
+      window._lastScoreTs = null;
       overlay.dataset.state = 'start';
       try {
         if(!AC) initAudio();
