@@ -6,6 +6,10 @@
   <title>AstroCats Neon — v3.0</title>
   
   <link rel="stylesheet" href="astrocats_style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.15.7/dist/soundfont-player.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/midi-player-js@2.1.9/dist/MidiPlayer.min.js"></script>
+</head>
+
 </head>
 <body>
   <canvas id="game"></canvas>
@@ -16,6 +20,10 @@
       <div class="chip" id="lives">Lives: 3</div>
       <div class="chip" id="missiles">Rockets: 0</div>
       <div class="chip stage" id="stage">Stage: Peashooter</div>
+      <select id="jukeboxSelect" class="chip">
+        <option value="">Jukebox: Off</option>
+        <option value="__all__">All (loop)</option>
+      </select>
       <button class="chip hud-toggle audio-toggle" id="toggleAudio" aria-pressed="true">Audio: On</button>
       <button class="chip hud-toggle music-toggle" id="toggleMusic" aria-pressed="true">Music: On</button>
       <button class="chip hud-status paused" id="pauseBtn" aria-pressed="true">Paused</button>
