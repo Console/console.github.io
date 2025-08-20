@@ -657,25 +657,10 @@ if (clearLbBtn) clearLbBtn.addEventListener('click', ()=>{
 renderLeaderboard();
 // --- Jukebox (MIDI) ---
 const jukeboxSel = document.getElementById('jukeboxSelect');
-const volSlider  = document.getElementById('jukeboxVol');
-const jb = { list: [], allMode:false, player:null, instrument:null, currentIndex:-1, chanInst:{}, gain:null };
-
+const jb = { list: [], allMode:false, player:null, instrument:null, currentIndex:-1, chanInst:{} };
 
 async function jbInit(){
   if (!jukeboxSel) return;
-// Ensure audio + a dedicated gain for MIDI output
-if (!AC) initAudio();
-if (AC && !jb.gain){
-  jb.gain = AC.createGain();
-  jb.gain.gain.value = volSlider ? (+volSlider.value||70)/100 : 0.7;
-  jb.gain.connect(masterGain); // sits under the game master mix
-}
-// Volume live-updates
-if (volSlider){
-  volSlider.addEventListener('input', ()=>{
-    if (jb.gain) jb.gain.gain.value = (+volSlider.value||0)/100;
-  });
-}
 
   // Load midi/playlist.json (must be served over http://, not file://)
   try{
@@ -704,30 +689,17 @@ async function ensureInstrument(){
   // Make sure we have an AudioContext + masterGain (your game’s audio graph)
   if (!AC) initAudio();
   if (!AC) return null;
-  if (!jb.gain && AC){
-  jb.gain = AC.createGain();
-  jb.gain.gain.value = volSlider ? (+volSlider.value||70)/100 : 0.7;
-  jb.gain.connect(masterGain);
-}
   if (jb.instrument) return jb.instrument;
   if (!window.Soundfont){ console.warn('Soundfont lib missing'); return null; }
-  jb.instrument = await Soundfont.instrument(AC, 'acoustic_grand_piano', { destination: jb.gain || masterGain });
-
+  jb.instrument = await Soundfont.instrument(AC, 'acoustic_grand_piano', { destination: masterGain });
   return jb.instrument;
 }
 // Load a Soundfont instrument by name (destination: your master mix)
 async function loadInstrument(name){
   if (!AC) initAudio();
   if (!AC || !window.Soundfont) return null;
-  if (!jb.gain && AC){
-  jb.gain = AC.createGain();
-  jb.gain.gain.value = volSlider ? (+volSlider.value||70)/100 : 0.7;
-  jb.gain.connect(masterGain);
-}
-
   try{
- return await Soundfont.instrument(AC, name, { destination: jb.gain || masterGain });
-
+    return await Soundfont.instrument(AC, name, { destination: masterGain });
   }catch(e){
     console.warn('Soundfont load failed', name, e);
     return null;
