@@ -566,7 +566,8 @@ for (const bh of game.blackholes) {if (bh.dead) continue;let dx = Math.abs(x - b
     // --- Backdrop ---
     function drawBackdrop(){ const w=window.innerWidth, h=window.innerHeight; ctx.save(); ctx.strokeStyle='rgba(138,43,226,0.08)'; ctx.lineWidth=1; ctx.shadowBlur=0; const step=40; ctx.beginPath(); for(let x=0;x<w;x+=step){ ctx.moveTo(x,0); ctx.lineTo(x,h); } for(let y=0;y<h;y+=step){ ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke(); const t=Date.now()*0.001; for(let i=0;i<60;i++){ const sx=(i*127.1)%w; const y=(i*83.3 + (t*10*i)%h)%h; const glow=(i%7===0)?10:6; ctx.beginPath(); ctx.fillStyle='rgba(24,240,255,0.2)'; ctx.shadowColor='#18f0ff'; ctx.shadowBlur=glow; ctx.arc(sx,y,1,0,TAU); ctx.fill(); } ctx.restore(); }
     function drawBossBar(){if(!game.bossActive || !game.boss || game.boss.dead) return;const b=game.boss, t=Math.max(0, Math.min(1, b.hp/(b.maxHp||1)));const w=Math.min(420, game.w*0.6), h=14, x=(game.w-w)/2, y=64;ctx.save();ctx.globalAlpha=0.95;ctx.fillStyle='rgba(0,0,0,0.45)'; ctx.fillRect(x,y,w,h);ctx.strokeStyle='rgba(138,43,226,0.6)'; ctx.lineWidth=2; ctx.strokeRect(x+0.5,y+0.5,w-1,h-1);ctx.fillStyle='#ff2f92'; ctx.fillRect(x,y,w*t,h);ctx.shadowColor='#18f0ff'; ctx.shadowBlur=8; ctx.font='12px ui-monospace, monospace'; ctx.fillStyle='#c7f5ff'; ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillText('BOSS', x+w/2, y-2); ctx.restore();}
-    function drawLaserHeatBar(){const t = game.laserHeat || 0; const w = 160, h = 8, x = game.w - w - 18, y = 96; ctx.save();ctx.globalAlpha = 0.95; ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(x,y,w,h); ctx.strokeStyle='rgba(24,240,255,0.6)'; ctx.lineWidth=2; ctx.strokeRect(x+0.5,y+0.5,w-1,h-1); if (game.laserOverheated) {   ctx.fillStyle = '#ff2f92'; ctx.fillRect(x,y,w,h);   ctx.font='12px ui-monospace, monospace'; ctx.fillStyle='#c7f5ff'; ctx.textAlign='right'; ctx.textBaseline='bottom';   ctx.fillText('OVERHEAT', x+w, y-2); } else {   ctx.fillStyle = '#18f0ff'; ctx.fillRect(x,y,w*t,h);   ctx.font='12px ui-monospace, monospace'; ctx.fillStyle='#c7f5ff'; ctx.textAlign='right'; ctx.textBaseline='bottom';   ctx.fillText('LASER', x+w, y-2); } ctx.restore();}
+    function drawLaserHeatBar(){ if(game.weaponStage!==4) return; const t = game.laserHeat || 0; const w = 160, h = 8, x = game.w - w - 18, y = 96; /* ...rest... */ }
+
     
     // --- Leaderboard (LocalStorage) ---
 const LB_KEY = 'acn_highscores_v1';
@@ -723,7 +724,7 @@ renderLeaderboard();
       for(const pk of game.pickups) pk.draw();
       if(game.ship) game.ship.draw();
       if (game.bossActive && game.boss && !game.boss.dead) drawBossBar();
-      drawLaserHeatBar();
+      if (game.weaponStage===4) drawLaserHeatBar();
       requestAnimationFrame(tick);
     }
     // Boot
