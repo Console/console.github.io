@@ -702,8 +702,8 @@ function jbStop(){
 
 async function playMidi(url){
   jbStop();
-  const MP = window.MidiPlayer || window.MIDIPlayer;
-  if (!MP){ console.warn('MidiPlayerJS missing'); return; }
+
+  if (!window.MidiPlayer){ console.warn('MidiPlayerJS missing'); return; }
   const inst = await ensureInstrument();
   if (!inst) return;
 
@@ -712,7 +712,7 @@ async function playMidi(url){
     if (!res.ok) throw new Error('HTTP '+res.status);
     const buf = await res.arrayBuffer();
 
-    const player = new MP.Player((evt) => {
+    const player = new MidiPlayer.Player((evt) => {
       if (evt.name === 'Note on' && evt.velocity > 0) {
         const note = evt.noteName || 'A4';
         const gain = Math.min(0.35, 0.15 + (evt.velocity||80)/127*0.25);
