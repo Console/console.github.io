@@ -59,3 +59,7 @@
     letter-spacing: .6px;
     box-shadow: 0 0 18px rgba(255,102,204,.2) inset;
   }
+
+  /* Show name entry only on Game Over */
+#startOverlay [data-section="name-entry"] { display: none !important; }
+#startOverlay[data-state="gameover"] [data-section="name-entry"] { display: flex !important; }
