@@ -657,7 +657,7 @@ if (clearLbBtn) clearLbBtn.addEventListener('click', ()=>{
 renderLeaderboard();
 // --- Jukebox (MIDI) ---
 const jukeboxSel = document.getElementById('jukeboxSelect');
-const jb = { list: [], allMode:false, player:null, instrument:null, currentIndex:-1 };
+const jb = { list: [], allMode:false, player:null, instrument:null, currentIndex:-1, chanInst:{} };
 
 async function jbInit(){
   if (!jukeboxSel) return;
@@ -694,6 +694,90 @@ async function ensureInstrument(){
   jb.instrument = await Soundfont.instrument(AC, 'acoustic_grand_piano', { destination: masterGain });
   return jb.instrument;
 }
+// Load a Soundfont instrument by name (destination: your master mix)
+async function loadInstrument(name){
+  if (!AC) initAudio();
+  if (!AC || !window.Soundfont) return null;
+  try{
+    return await Soundfont.instrument(AC, name, { destination: masterGain });
+  }catch(e){
+    console.warn('Soundfont load failed', name, e);
+    return null;
+  }
+}
+
+// Coarse GM program# -> soundfont-player preset name
+function gmNameFromProgram(p){
+  if (p==null) return 'acoustic_grand_piano';
+  if (p<8)  return 'acoustic_grand_piano';
+  if (p<16) return 'electric_piano_1';
+  if (p<24) return 'drawbar_organ';
+  if (p<32) return 'acoustic_guitar_nylon';
+  if (p<40) return 'electric_guitar_clean';
+  if (p<48) return 'electric_bass_finger';
+  if (p<56) return 'string_ensemble_1';
+  if (p<64) return 'trumpet';
+  if (p<72) return 'soprano_sax';
+  if (p<80) return 'lead_1_square';
+  if (p<88) return 'synth_brass_1';
+  if (p<96) return 'pad_1_new_age';
+  if (p<104) return 'fx_1_rain';
+  if (p<112) return 'sitar';
+  if (p<120) return 'synth_drum';
+  return 'acoustic_grand_piano';
+}
+
+// Read Program Change events from the parsed MIDI and preload instruments.
+// Uses MidiPlayerJS to parse; falls back harmlessly if structure differs.
+async function prescanAndPreloadInstruments(arrayBuffer){
+  const MP = window.MidiPlayer || window.MIDIPlayer;
+  if (!MP || !window.Soundfont) return;
+
+  // Parse MIDI without starting playback
+  let programs = new Map(); // channel -> program#
+  try{
+    const scan = new MP.Player(()=>{});
+    scan.loadArrayBuffer(arrayBuffer);
+
+    // Try a few common shapes for event storage
+    const maybeLists = [];
+    if (Array.isArray(scan.tracks)) maybeLists.push(...scan.tracks);
+    if (Array.isArray(scan.events)) maybeLists.push(scan.events);
+    if (typeof scan.getEvents === 'function') maybeLists.push(scan.getEvents());
+
+    const flat = [].concat(...maybeLists);
+    for (const evt of flat){
+      if (!evt) continue;
+      const name = evt.name || evt.type;
+      if (name === 'Program Change'){
+        const ch = (evt.channel ?? 0)|0;
+        const prog = (evt.value ?? evt.programNumber ?? evt.program ?? 0)|0;
+        programs.set(ch, prog);
+      }
+    }
+  }catch(e){
+    // If the library shape changes, we simply skip preloading and play with fallback.
+    console.warn('Jukebox prescan skipped (could not introspect events).', e);
+  }
+
+  // Drums (channel 10 => index 9) get a sensible default if not declared
+  if (!programs.has(9)) programs.set(9, 118);
+
+  // Preload and cache per-channel instruments
+  jb.chanInst = {};
+  const loads = [];
+  for (const [ch, prog] of programs){
+    const name = (ch === 9) ? 'synth_drum' : gmNameFromProgram(prog);
+    loads.push(loadInstrument(name).then(inst => { if (inst) jb.chanInst[ch] = inst; }));
+  }
+  await Promise.all(loads);
+
+  // Also ensure a default/fallback instrument exists
+  if (!jb.instrument) {
+    jb.instrument = await loadInstrument('acoustic_grand_piano');
+  }
+}
+
 
 function jbStop(){
   try { jb.player?.stop(); } catch(_) {}
@@ -711,12 +795,17 @@ async function playMidi(url){
     const res = await fetch(url, {cache:'no-store'});
     if (!res.ok) throw new Error('HTTP '+res.status);
     const buf = await res.arrayBuffer();
+    await prescanAndPreloadInstruments(buf);
 
-    const player = new MP.Player((evt) => {
+const player = new MP.Player((evt) => {
       if (evt.name === 'Note on' && evt.velocity > 0) {
         const note = evt.noteName || 'A4';
-        const gain = Math.min(0.35, 0.15 + (evt.velocity||80)/127*0.25);
-        inst.play(note, AC.currentTime, { gain, duration: 0.30 });
+        const vel  = Math.max(0, Math.min(1, (evt.velocity||80)/127));
+        const gain = 0.12 + vel*0.23; // ~0.12–0.35
+        // Pick instrument per channel if we have one, else fallback
+        const ch = (evt.channel ?? 0)|0;
+        const instToUse = (jb.chanInst && jb.chanInst[ch]) || inst;
+        if (instToUse) instToUse.play(note, AC.currentTime, { gain, duration: 0.30 });
       }
     });
 
