@@ -655,6 +655,112 @@ if (clearLbBtn) clearLbBtn.addEventListener('click', ()=>{
 
 // initial render on load
 renderLeaderboard();
+// --- Jukebox (MIDI) ---
+const jukeboxSel = document.getElementById('jukeboxSelect');
+const jb = { list: [], allMode:false, player:null, instrument:null, currentIndex:-1 };
+
+async function jbInit(){
+  if (!jukeboxSel) return;
+
+  // Load midi/playlist.json (must be served over http://, not file://)
+  try{
+    const res = await fetch('midi/playlist.json', {cache:'no-store'});
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const arr = await res.json();
+    jb.list = (arr||[])
+      .filter(s=>/\.mid(i)?$/i.test(s))
+      .map(s=> s.startsWith('midi/') ? s : `midi/${s}`);
+
+    // Populate dropdown after the built-in "Off" and "All (loop)" options
+    for (const url of jb.list){
+      const opt = document.createElement('option');
+      opt.value = url;
+      opt.textContent = url.split('/').pop();
+      jukeboxSel.appendChild(opt);
+    }
+  } catch(e){
+    console.warn('Jukebox: playlist.json not found or blocked (use a local server).', e);
+  }
+
+  jukeboxSel.addEventListener('change', onJukeboxChange);
+}
+
+async function ensureInstrument(){
+  // Make sure we have an AudioContext + masterGain (your game’s audio graph)
+  if (!AC) initAudio();
+  if (!AC) return null;
+  if (jb.instrument) return jb.instrument;
+  if (!window.Soundfont){ console.warn('Soundfont lib missing'); return null; }
+  jb.instrument = await Soundfont.instrument(AC, 'acoustic_grand_piano', { destination: masterGain });
+  return jb.instrument;
+}
+
+function jbStop(){
+  try { jb.player?.stop(); } catch(_) {}
+  jb.player = null;
+}
+
+async function playMidi(url){
+  jbStop();
+
+  if (!window.MidiPlayer){ console.warn('MidiPlayerJS missing'); return; }
+  const inst = await ensureInstrument();
+  if (!inst) return;
+
+  try{
+    const res = await fetch(url, {cache:'no-store'});
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const buf = await res.arrayBuffer();
+
+    const player = new MidiPlayer.Player((evt) => {
+      if (evt.name === 'Note on' && evt.velocity > 0) {
+        const note = evt.noteName || 'A4';
+        const gain = Math.min(0.35, 0.15 + (evt.velocity||80)/127*0.25);
+        inst.play(note, AC.currentTime, { gain, duration: 0.30 });
+      }
+    });
+
+    player.loadArrayBuffer(buf);
+    player.on('endOfFile', ()=>{
+      if (jb.allMode && jb.list.length){
+        jb.currentIndex = (jb.currentIndex + 1) % jb.list.length;
+        playMidi(jb.list[jb.currentIndex]);
+      }
+    });
+
+    // Mute the built-in synth music while MIDI is playing
+    try { stopMusic(); } catch(_) {}
+    musicEnabled = false;
+    const btn = document.getElementById('toggleMusic');
+    if (btn){ btn.setAttribute('aria-pressed','false'); btn.textContent = 'Music: Off'; }
+
+    jb.player = player;
+    player.play();
+  } catch (err){
+    console.warn('Jukebox: failed to fetch/play', url, err);
+  }
+}
+
+function onJukeboxChange(){
+  const v = jukeboxSel.value;
+  jb.allMode = (v === '__all__');
+
+  if (v === '') { // Off
+    jbStop();
+    return;
+  }
+  if (jb.allMode){
+    if (!jb.list.length){ console.warn('Jukebox: empty playlist'); return; }
+    jb.currentIndex = 0;
+    playMidi(jb.list[jb.currentIndex]);
+  } else {
+    playMidi(v);
+  }
+}
+
+jbInit();
+
+
 
     function togglePause(){ game.paused=!game.paused; pauseBtn.setAttribute('aria-pressed', game.paused?'true':'false'); pauseBtn.textContent= game.paused? 'Paused':'Pause'; }
 
