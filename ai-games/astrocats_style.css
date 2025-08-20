@@ -76,4 +76,10 @@ select.chip{
   box-shadow: 0 0 16px rgba(24,240,255,.15) inset, 0 0 24px rgba(24,240,255,.1);
 }
 select.chip:focus { outline: none; border-color: var(--ui); }
-
+/* Jukebox volume slider */
+#jukeboxVol{
+  pointer-events:auto;
+  width:120px;
+  accent-color: var(--ui);  /* leverages the neon color */
+  background: transparent;  /* keep HUD glass look */
+}
