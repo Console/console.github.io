@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ChittyKitty — Offline Trip Expense Splitter</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>ChittyKitty</h1>
+    <div class="status">
+      <span id="onlineStatus" class="badge offline">offline</span>
+
+      <button id="manageBtn" class="ghost" aria-pressed="false" title="Show edit/delete controls">Manage</button>
+
+      <!-- FX API key controls (optional) -->
+      <form id="apiKeyForm" class="apikey-form" autocomplete="off">
+        <input
+          type="password"
+          id="apiKeyInput"
+          placeholder="FX API key (access_key)"
+          aria-label="FX API key (access_key)"
+        />
+        <button type="submit" class="ghost" title="Save API key">Save</button>
+        <button type="button" id="clearApiKeyBtn" class="ghost" title="Clear API key">Clear</button>
+        <span id="apiKeySavedBadge" class="badge muted hidden">key saved</span>
+      </form>
+
+      <button id="retryFxBtn" class="ghost">Retry FX</button>
+      <button id="flushFxBtn" class="ghost">Flush FX Cache</button>
+      <button id="helpBtn" class="ghost">Help</button>
+
+      <!-- Export panel -->
+      <details id="exportPanel" class="pop">
+        <summary>Export</summary>
+        <div class="pop-body">
+          <div class="radio-col">
+            <label><input type="radio" name="exportScope" value="all" checked> All trips</label>
+            <label><input type="radio" name="exportScope" value="current"> Current trip</label>
+            <label><input type="radio" name="exportScope" value="selected"> Selected trips</label>
+          </div>
+          <div id="exportTripChecks" class="checks hidden"></div>
+          <button id="doExportBtn">Export JSON</button>
+        </div>
+      </details>
+
+      <!-- Import -->
+      <label class="file-btn">
+        Import JSON
+        <input type="file" id="importInput" accept="application/json" />
+      </label>
+      
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <section>
+        <h2>Trips</h2>
+        <ul id="tripList" class="list"></ul>
+        <details class="new-box" open>
+          <summary>Create Trip</summary>
+          <form id="newTripForm" class="form-grid">
+            <label>
+              Name
+              <input type="text" id="tripName" required />
+            </label>
+            <label>
+              Home currency
+              <select id="tripCurrency"></select>
+            </label>
+            <button type="submit">Add Trip</button>
+          </form>
+        </details>
+      </section>
+    </aside>
+
+    <section class="content" id="content" aria-live="polite">
+      <div id="emptyState" class="empty">
+        <p>No trips yet. Create one to get started.</p>
+      </div>
+
+      <div id="tripView" class="hidden">
+        <header class="trip-header">
+          <div>
+            <h2 id="tripTitle">Trip</h2>
+            <div class="muted">Home currency: <span id="tripHomeCurrency"></span></div>
+          </div>
+          <div class="trip-actions">
+            <button id="editTripBtn" class="ghost manage-only">Edit Trip</button>
+            <button id="deleteTripBtn" class="danger manage-only">Delete Trip</button>
+            <button id="calcBtn" class="primary">Calculate Settlement</button>
+          </div>
+        </header>
+
+        <div class="grid-2">
+          <section>
+            <h3>Members</h3>
+            <ul id="memberList" class="list small"></ul>
+            <form id="newMemberForm" class="inline-form">
+              <input type="text" id="memberName" placeholder="Add member..." required />
+              <button type="submit">Add</button>
+            </form>
+          </section>
+
+          <section>
+            <h3 id="expenseFormTitle">Add Expense</h3>
+            <form id="expenseForm" class="form-grid">
+              <label>
+                Description
+                <input type="text" id="expDesc" required />
+              </label>
+              <label>
+                Amount
+                <input type="number" id="expAmount" step="0.01" min="0.01" required />
+              </label>
+              <label>
+                Currency
+                <select id="expCurrency"></select>
+              </label>
+              <label>
+                Payer
+                <select id="expPayer"></select>
+              </label>
+              <label>
+                Date &amp; time
+                <input type="datetime-local" id="expWhen" required />
+              </label>
+              <label>
+                Manual FX rate
+                <input type="number" id="expFx" step="0.000001" placeholder="optional" />
+                <span class="hint" id="fxHint"></span>
+              </label>
+              <fieldset id="participantBox" class="participants">
+                <legend>Participants (equal split)</legend>
+                <div id="participantChecks" class="checks"></div>
+              </fieldset>
+              <div class="row-actions">
+                <button type="submit" id="expSubmitBtn">Add Expense</button>
+                <button type="button" id="cancelEditExpenseBtn" class="ghost hidden">Cancel</button>
+              </div>
+            </form>
+          </section>
+        </div>
+
+        <section>
+          <h3>Expenses</h3>
+          <div id="pendingFxBanner" class="banner hidden">Some expenses have pending FX rates. Click “Retry FX” when online to backfill.</div>
+          <table class="table" id="expenseTable">
+            <thead>
+            <tr>
+              <th>Description</th>
+              <th class="num">Amount</th>
+              <th>Currency</th>
+              <th>Payer</th>
+              <th>Date</th>
+              <th>Participants</th>
+              <th>FX</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody id="expenseBody"></tbody>
+          </table>
+        </section>
+
+        <section>
+          <h3>Settlement</h3>
+          <div id="settlementArea" class="settlement">
+            <div class="muted">Press “Calculate Settlement” to compute balances.</div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <!-- Import scope modal (unchanged) -->
+  <div id="importPanel" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+    <div class="modal-inner">
+      <h3 id="importTitle">Import trips</h3>
+      <div class="radio-col" style="margin-bottom:8px">
+        <label><input type="radio" name="importScope" value="all" checked> All trips in file</label>
+        <label><input type="radio" name="importScope" value="selected"> Selected trips</label>
+      </div>
+      <div id="importTripChecks" class="checks hidden"></div>
+      <div class="row-actions" style="margin-top:12px">
+        <button id="confirmImportBtn">Import</button>
+        <button id="cancelImportBtn" class="ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>Offline-first. Data lives on your device (IndexedDB). Share JSON to sync across devices.</span>
+  </footer>
+
+  <!-- Help / How-to modal -->
+  <div id="helpModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal-inner prose">
+      <header class="modal-header">
+        <h3 id="helpTitle">Welcome to ChittyKitty</h3>
+      </header>
+
+      <div class="modal-body">
+        <p>ChittyKitty is an offline-first trip expense splitter.</p>
+        <ol>
+          <li><strong>Create a trip</strong> with a name and a home currency.</li>
+          <li><strong>Add members</strong> (Jane, John…).</li>
+          <li><strong>Add expenses</strong>:
+            <ul>
+              <li>Pick a payer, amount, currency, and date/time.</li>
+              <li>Select the <em>Participants (equal split)</em>. The payer is always included.</li>
+              <li>FX: leave blank to auto-fetch historical USD-based rates; offline entries become <em>pending</em> and will backfill later.</li>
+            </ul>
+          </li>
+          <li><strong>Live totals</strong> show in Members (paid so far, home currency).</li>
+          <li><strong>Calculate Settlement</strong> to get the minimal transfers.</li>
+          <li><strong>Export / Import</strong> (current/selected/all trips) to sync via files. Imports merge safely.</li>
+          <li><strong>Manage</strong> toggles edit/delete controls. You can also flush the FX cache.</li>
+        </ol>
+        <details>
+          <summary>FX details</summary>
+          <p>Rates are fetched as a USD-&gt;all table per day from exchangerate.host and cached. Conversions use USD as the
+          mediator: <code>rate(from→home) = USD→home / USD→from</code>. Pending items are excluded until resolved.</p>
+        </details>
+      </div>
+
+      <div class="row-actions" style="margin-top:12px">
+        <button id="closeHelpBtn">Got it</button>
+      </div>
+  </div>
+</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
