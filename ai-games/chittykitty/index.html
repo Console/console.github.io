@@ -19,20 +19,21 @@
         <input
           type="password"
           id="apiKeyInput"
+          class="manage-only"
           placeholder="FX API key (access_key)"
           aria-label="FX API key (access_key)"
         />
-        <button type="submit" class="ghost" title="Save API key">Save</button>
-        <button type="button" id="clearApiKeyBtn" class="ghost" title="Clear API key">Clear</button>
-        <span id="apiKeySavedBadge" class="badge muted hidden">key saved</span>
+        <button type="submit" class="ghost manage-only" title="Save API key">Save</button>
+        <button type="button" id="clearApiKeyBtn" class="ghost manage-only" title="Clear API key">Clear</button>
+        <span id="apiKeySavedBadge" class="badge muted manage-only hidden">key saved</span>
       </form>
 
-      <button id="retryFxBtn" class="ghost">Retry FX</button>
-      <button id="flushFxBtn" class="ghost">Flush FX Cache</button>
+      <button id="retryFxBtn" class="ghost manage-only">Retry FX</button>
+      <button id="flushFxBtn" class="ghost manage-only">Flush FX Cache</button>
       <button id="helpBtn" class="ghost">Help</button>
 
       <!-- Export panel -->
-      <details id="exportPanel" class="pop">
+      <details id="exportPanel" class="pop manage-only">
         <summary>Export</summary>
         <div class="pop-body">
           <div class="radio-col">
@@ -41,12 +42,12 @@
             <label><input type="radio" name="exportScope" value="selected"> Selected trips</label>
           </div>
           <div id="exportTripChecks" class="checks hidden"></div>
-          <button id="doExportBtn">Export JSON</button>
+          <button id="doExportBtn" >Export JSON</button>
         </div>
       </details>
 
       <!-- Import -->
-      <label class="file-btn">
+      <label class="file-btn manage-only">
         Import JSON
         <input type="file" id="importInput" accept="application/json" />
       </label>
