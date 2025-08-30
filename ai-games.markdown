@@ -47,4 +47,4 @@ You will need an API key to make use of this feature, or you can enter the conve
 
 Is it 100% bug free - no. Tread carefully, though if you export a copy of your json you can usually restore the trip from data after deleting it. It does do the divvying up of money correctly though as far as I've tested it.
 
-I'll open-source it (though its a standalone JS based app... so I mean... you have it) on github at somepoint, repo will move from private to public but figured I'd share it on this site first.
+I'll open-source it (though its a standalone JS based app... so I mean...) on github at somepoint, repo will move from private to public but figured I'd share it on this site first.
