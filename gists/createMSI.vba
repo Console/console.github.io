@@ -1,5 +1,6 @@
 Option Explicit
-
+'https://github.com/MicrosoftDocs/win32/blob/docs/desktop-src/Msi/standard-actions-reference.md
+'https://github.com/MicrosoftDocs/win32/blob/docs/desktop-src/Msi/summary-list-of-all-custom-action-types.md
 ' Demo: create an MSI with Type 6 VBScript custom actions.
 ' - Runs once very early ("Pre-UI") before any authored UI dialogs.
 ' - Runs again later in the UI sequence ("UI").
