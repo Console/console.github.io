@@ -2,7 +2,7 @@
 layout: gallery
 title: ISS Transit June 2026
 description: Just some output from my efforts in attempting to capture the ISS as it flew across the sun in 0.8 seconds, on one sunny day in June.
-cover: /assets/gallery/longleat-2026/DSCF2204-The_House.jpg
+cover: /assets/gallery/iss-transit-june-2026/iss-transit-stacked.png
 tags:
   - iss
   - astro
@@ -42,4 +42,4 @@ Using BIMP the Batch image processor plugin for GIMP I applied the same crop, sh
 
 Then loaded every one of the 23 frames of the ISS transit as a layer in the base image and using a mask painted in only the area in each layer to build up the stacked image of the ISS sillouette moving in front of the surface of the sun.
 
-The indivudal frame, is the "highest quality" (according to pipp) single frame I managed to get from the video footage, cropped down to see a single shot of the ISS. I plan on making a blog post about it on the site at some point that'll go over the planning and logistics of doing it, along with more detail on the editing. I've also got a video of the transit pass too, that i'll share there when I get a round tuit.
+The individual frame, is the "highest quality" (according to pipp) single frame I managed to get from the video footage, cropped down to see a single shot of the ISS. I plan on making a blog post about it on the site at some point that'll go over the planning and logistics of doing it, along with more detail on the editing. I've also got a video of the transit pass too, that i'll share there when I get a round tuit.
