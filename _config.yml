@@ -31,8 +31,8 @@ mastodon:
 author: Scriptmonkey_
 logo: /assets/logo-50px.png
 rss: RSS Feed
-# Constrain excerpt to first sentence
-excerpt_separator: .
+# Constrain excerpts to the first paragraph so markdown links stay intact.
+excerpt_separator: "\n\n"
 # Build settings
 # Removed minima theme as it is now a regular theme.
 # theme: minima
