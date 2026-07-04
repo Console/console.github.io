@@ -34,7 +34,7 @@ photos:
       - solar
 ---
 
-An off the cuff attempt at capturing the ISS as it transited the sun one day in June. I used a Dwarf 3 smart telescope to take a 4k video of the transit at 30 frames per secondm. Loaded the subsequent video into PIPP for conversion into a series of tiff files.
+An off the cuff attempt at capturing the ISS as it transited the sun one day in June. I used a Dwarf 3 smart telescope to take a 4k video of the transit at 30 frames per second. Loaded the subsequent video into PIPP for conversion into a series of tiff files.
 
 I then created a "base" solar image using footage before and after the ISS transit to provide a nice stacked and sharpened image for me to work on in GIMP, then I individually sharpened each transit TIFF image in registax 6 using wavelets.
 
