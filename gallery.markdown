@@ -4,7 +4,11 @@ title: Gallery
 permalink: /gallery/
 ---
 
-A collection of photo albums and image sets.
+A collection of photographs i've taken through the years. I dabble in astrophotography and normal photography. Most of these will be taken with my Fujifilm X100F camera, I find the camera itself pretty useful for most photographic tasks, it's wide angle lens basically being 35mm equivalent and the 24 megapixel captures are enough that some cropping is usually enough to get in closer to further away targets.
+
+For those targets that happen to be several light years away though - I typically use either my DWARF3 Smart telescope, my William Optics RedCat51 Refractor or my SVBony MK127 Maksutov-cassegrain scope, coupled with a number of ZWO cameras from the ASIAir 585MC, a 585MC Pro, or a 715MC planetary camera or for guiding an ASI 129MM mini. I'll use tags in the galleries below to tag what equipment I used with which.
+
+These images are not the final high resolution images, due to size constraints and not forcing folk to download 100MB+ images, I've saved them as 8bit JPG at 80% quality. If you'd like any of the images for any reason please give me a shout via my socials.
 
 <div class="gallery-album-list">
   {%- assign galleries = site.galleries | sort: "title" -%}
