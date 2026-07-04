@@ -1,11 +1,11 @@
 {%- assign photos = include.photos -%}
 {%- if photos -%}
-  <div class="gallery-grid">
+  <div class="gallery-grid" id="gallery-grid">
     {%- for photo in photos -%}
       {%- assign caption = photo.caption | default: "" -%}
       {%- assign alt = photo.alt | default: caption | default: page.title -%}
       <figure class="gallery-item">
-        <a href="{{ photo.image | relative_url }}" class="gallery-image-link">
+        <a href="#photo-{{ forloop.index }}" class="gallery-image-link">
           <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}" loading="lazy">
         </a>
         {%- if caption or photo.tags -%}

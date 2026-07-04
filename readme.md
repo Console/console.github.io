@@ -175,6 +175,14 @@ Individual albums are published at:
 /gallery/album-file-name/
 ```
 
+Clicking a gallery thumbnail opens an in-page photo viewer at a fragment URL such as:
+
+```text
+/gallery/album-file-name/#photo-1
+```
+
+The viewer includes previous and next links, a close link back to the thumbnail grid, captions, tags, and a direct link to open the original image file.
+
 ## Styling
 
 Main Sass entry point:

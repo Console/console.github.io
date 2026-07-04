@@ -1,0 +1,46 @@
+{%- assign photos = include.photos -%}
+{%- if photos -%}
+  <div class="gallery-viewers" aria-label="Gallery photo viewer">
+    {%- for photo in photos -%}
+      {%- assign caption = photo.caption | default: "" -%}
+      {%- assign alt = photo.alt | default: caption | default: page.title -%}
+      {%- assign current_index = forloop.index -%}
+      {%- if forloop.first -%}
+        {%- assign previous_index = photos.size -%}
+      {%- else -%}
+        {%- assign previous_index = current_index | minus: 1 -%}
+      {%- endif -%}
+      {%- if forloop.last -%}
+        {%- assign next_index = 1 -%}
+      {%- else -%}
+        {%- assign next_index = current_index | plus: 1 -%}
+      {%- endif -%}
+      <section class="gallery-viewer" id="photo-{{ current_index }}" aria-labelledby="photo-{{ current_index }}-caption">
+        <div class="gallery-viewer-inner">
+          <a class="gallery-viewer-close" href="#gallery-grid" aria-label="Close photo viewer">Close</a>
+          <div class="gallery-viewer-image-wrap">
+            <a class="gallery-viewer-nav gallery-viewer-prev" href="#photo-{{ previous_index }}" aria-label="Previous photo">Previous</a>
+            <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}">
+            <a class="gallery-viewer-nav gallery-viewer-next" href="#photo-{{ next_index }}" aria-label="Next photo">Next</a>
+          </div>
+          <div class="gallery-viewer-meta">
+            <p class="gallery-viewer-count">Photo {{ current_index }} of {{ photos.size }}</p>
+            {%- if caption -%}
+              <p class="gallery-caption" id="photo-{{ current_index }}-caption">{{ caption }}</p>
+            {%- else -%}
+              <p class="gallery-caption" id="photo-{{ current_index }}-caption">{{ page.title | escape }}</p>
+            {%- endif -%}
+            {%- if photo.tags -%}
+              <ul class="gallery-tag-list gallery-photo-tags" aria-label="Photo tags">
+                {%- for tag in photo.tags -%}
+                  <li>{{ tag }}</li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+            <p class="gallery-original-link"><a href="{{ photo.image | relative_url }}">Open original image</a></p>
+          </div>
+        </div>
+      </section>
+    {%- endfor -%}
+  </div>
+{%- endif -%}
