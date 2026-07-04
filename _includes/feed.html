@@ -22,7 +22,9 @@
                 <span class="title"><a href="{{postURL}}" class="post-link">{{postTitle}}</a></span>
             </div>
             <div class="card-excerpt">
-                {{ post.excerpt }}
+                {%- assign summaryParts = post.content | split: '<p>' -%}
+                {%- assign summaryParagraph = summaryParts[1] | split: '</p>' | first -%}
+                <p>{{ summaryParagraph }}</p>
             </div>
             <div class="card-date">
                 {%- assign postDate = post.date | date: "%Y/%m/%d" -%}

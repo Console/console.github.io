@@ -28,7 +28,8 @@ These images are not the final high resolution images, due to size constraints a
         {%- if gallery.tags -%}
           <ul class="gallery-tag-list" aria-label="Gallery tags">
             {%- for tag in gallery.tags -%}
-              <li>{{ tag }}</li>
+              {%- assign tag_slug = tag | append: "" | slugify -%}
+              <li><a href="{{ '/gallery/tags/' | relative_url }}#tag-{{ tag_slug }}">{{ tag }}</a></li>
             {%- endfor -%}
           </ul>
         {%- endif -%}

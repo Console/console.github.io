@@ -11,7 +11,8 @@ layout: default
     {%- if page.tags -%}
       <ul class="gallery-tag-list" aria-label="Gallery tags">
         {%- for tag in page.tags -%}
-          <li>{{ tag }}</li>
+          {%- assign tag_slug = tag | append: "" | slugify -%}
+          <li><a href="{{ '/gallery/tags/' | relative_url }}#tag-{{ tag_slug }}">{{ tag }}</a></li>
         {%- endfor -%}
       </ul>
     {%- endif -%}

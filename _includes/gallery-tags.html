@@ -1,0 +1,203 @@
+{%- assign tag_names = "" -%}
+{%- for gallery in site.galleries -%}
+  {%- for tag in gallery.tags -%}
+    {%- assign tag_names = tag_names | append: tag | append: "|" -%}
+  {%- endfor -%}
+  {%- for photo in gallery.photos -%}
+    {%- for tag in photo.tags -%}
+      {%- assign tag_names = tag_names | append: tag | append: "|" -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endfor -%}
+
+{%- assign tags = tag_names | split: "|" | uniq | sort -%}
+
+{%- if tags.size > 0 -%}
+  <div class="gallery-tag-browser">
+  <nav class="gallery-tag-index" aria-label="Gallery tag index">
+    <ul class="gallery-tag-list">
+      {%- for tag in tags -%}
+        {%- unless tag == "" -%}
+          {%- assign tag_slug = tag | append: "" | slugify -%}
+          <li><a href="#tag-{{ tag_slug }}">{{ tag }}</a></li>
+        {%- endunless -%}
+      {%- endfor -%}
+    </ul>
+  </nav>
+
+  <p class="gallery-tag-empty-state">Choose a tag to view matching albums and photos.</p>
+
+  <div class="gallery-tag-sections">
+    {%- for tag in tags -%}
+      {%- unless tag == "" -%}
+        {%- assign tag_slug = tag | append: "" | slugify -%}
+        {%- assign match_count = 0 -%}
+        {%- for gallery in site.galleries -%}
+          {%- for photo in gallery.photos -%}
+            {%- assign photo_matches_tag = false -%}
+            {%- for gallery_tag in gallery.tags -%}
+              {%- assign gallery_tag_slug = gallery_tag | append: "" | slugify -%}
+              {%- if gallery_tag_slug == tag_slug -%}
+                {%- assign photo_matches_tag = true -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- for photo_tag in photo.tags -%}
+              {%- assign photo_tag_slug = photo_tag | append: "" | slugify -%}
+              {%- if photo_tag_slug == tag_slug -%}
+                {%- assign photo_matches_tag = true -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if photo_matches_tag -%}
+              {%- assign match_count = match_count | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endfor -%}
+
+        <section class="gallery-tag-section" id="tag-{{ tag_slug }}">
+          <header class="gallery-tag-header">
+            <h2>{{ tag }}</h2>
+            <p>{{ match_count }} photo{% if match_count != 1 %}s{% endif %}</p>
+          </header>
+
+          <div class="gallery-tag-albums">
+            {%- for gallery in site.galleries -%}
+              {%- assign gallery_matches_tag = false -%}
+              {%- for gallery_tag in gallery.tags -%}
+                {%- assign gallery_tag_slug = gallery_tag | append: "" | slugify -%}
+                {%- if gallery_tag_slug == tag_slug -%}
+                  {%- assign gallery_matches_tag = true -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if gallery_matches_tag -%}
+                <article class="gallery-tag-album-card">
+                  {%- assign cover = gallery.cover | default: gallery.photos.first.image -%}
+                  {%- if cover -%}
+                    <a href="{{ gallery.url | relative_url }}" class="gallery-tag-album-cover">
+                      <img src="{{ cover | relative_url }}" alt="{{ gallery.title | escape }}">
+                    </a>
+                  {%- endif -%}
+                  <div>
+                    <h3><a href="{{ gallery.url | relative_url }}">{{ gallery.title | escape }}</a></h3>
+                    {%- if gallery.description -%}
+                      <p>{{ gallery.description | escape }}</p>
+                    {%- endif -%}
+                  </div>
+                </article>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          <div class="gallery-grid gallery-tag-grid">
+            {%- assign match_index = 0 -%}
+            {%- for gallery in site.galleries -%}
+              {%- for photo in gallery.photos -%}
+                {%- assign photo_matches_tag = false -%}
+                {%- for gallery_tag in gallery.tags -%}
+                  {%- assign gallery_tag_slug = gallery_tag | append: "" | slugify -%}
+                  {%- if gallery_tag_slug == tag_slug -%}
+                    {%- assign photo_matches_tag = true -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- for photo_tag in photo.tags -%}
+                  {%- assign photo_tag_slug = photo_tag | append: "" | slugify -%}
+                  {%- if photo_tag_slug == tag_slug -%}
+                    {%- assign photo_matches_tag = true -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if photo_matches_tag -%}
+                  {%- assign match_index = match_index | plus: 1 -%}
+                  {%- assign caption = photo.caption | default: "" -%}
+                  {%- assign alt = photo.alt | default: caption | default: gallery.title -%}
+                  <figure class="gallery-item">
+                    <a href="#tag-{{ tag_slug }}-photo-{{ match_index }}" class="gallery-image-link">
+                      <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}" loading="lazy">
+                    </a>
+                    <figcaption>
+                      {%- if caption -%}
+                        <span class="gallery-caption">{{ caption }}</span>
+                      {%- endif -%}
+                      <span class="gallery-source-album"><a href="{{ gallery.url | relative_url }}">{{ gallery.title | escape }}</a></span>
+                      {%- if photo.tags -%}
+                        <ul class="gallery-tag-list gallery-photo-tags" aria-label="Photo tags">
+                          {%- for photo_tag in photo.tags -%}
+                            {%- assign photo_tag_slug = photo_tag | append: "" | slugify -%}
+                            <li><a href="#tag-{{ photo_tag_slug }}">{{ photo_tag }}</a></li>
+                          {%- endfor -%}
+                        </ul>
+                      {%- endif -%}
+                    </figcaption>
+                  </figure>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endfor -%}
+          </div>
+
+          <div class="gallery-viewers" aria-label="Gallery tag viewer for {{ tag | escape }}">
+            {%- assign match_index = 0 -%}
+            {%- for gallery in site.galleries -%}
+              {%- for photo in gallery.photos -%}
+                {%- assign photo_matches_tag = false -%}
+                {%- for gallery_tag in gallery.tags -%}
+                  {%- assign gallery_tag_slug = gallery_tag | append: "" | slugify -%}
+                  {%- if gallery_tag_slug == tag_slug -%}
+                    {%- assign photo_matches_tag = true -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- for photo_tag in photo.tags -%}
+                  {%- assign photo_tag_slug = photo_tag | append: "" | slugify -%}
+                  {%- if photo_tag_slug == tag_slug -%}
+                    {%- assign photo_matches_tag = true -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if photo_matches_tag -%}
+                  {%- assign match_index = match_index | plus: 1 -%}
+                  {%- assign caption = photo.caption | default: "" -%}
+                  {%- assign alt = photo.alt | default: caption | default: gallery.title -%}
+                  {%- if match_index == 1 -%}
+                    {%- assign previous_index = match_count -%}
+                  {%- else -%}
+                    {%- assign previous_index = match_index | minus: 1 -%}
+                  {%- endif -%}
+                  {%- if match_index == match_count -%}
+                    {%- assign next_index = 1 -%}
+                  {%- else -%}
+                    {%- assign next_index = match_index | plus: 1 -%}
+                  {%- endif -%}
+                  <section class="gallery-viewer" id="tag-{{ tag_slug }}-photo-{{ match_index }}" aria-labelledby="tag-{{ tag_slug }}-photo-{{ match_index }}-caption">
+                    <div class="gallery-viewer-inner">
+                      <a class="gallery-viewer-close" href="#tag-{{ tag_slug }}" aria-label="Close photo viewer">Close</a>
+                      <div class="gallery-viewer-image-wrap">
+                        <a class="gallery-viewer-nav gallery-viewer-prev" href="#tag-{{ tag_slug }}-photo-{{ previous_index }}" aria-label="Previous photo">Previous</a>
+                        <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}">
+                        <a class="gallery-viewer-nav gallery-viewer-next" href="#tag-{{ tag_slug }}-photo-{{ next_index }}" aria-label="Next photo">Next</a>
+                      </div>
+                      <div class="gallery-viewer-meta">
+                        <p class="gallery-viewer-count">{{ tag }} photo {{ match_index }} of {{ match_count }}</p>
+                        {%- if caption -%}
+                          <p class="gallery-caption" id="tag-{{ tag_slug }}-photo-{{ match_index }}-caption">{{ caption }}</p>
+                        {%- else -%}
+                          <p class="gallery-caption" id="tag-{{ tag_slug }}-photo-{{ match_index }}-caption">{{ gallery.title | escape }}</p>
+                        {%- endif -%}
+                        <p class="gallery-source-album"><a href="{{ gallery.url | relative_url }}">{{ gallery.title | escape }}</a></p>
+                        {%- if photo.tags -%}
+                          <ul class="gallery-tag-list gallery-photo-tags" aria-label="Photo tags">
+                            {%- for photo_tag in photo.tags -%}
+                              {%- assign photo_tag_slug = photo_tag | append: "" | slugify -%}
+                              <li><a href="#tag-{{ photo_tag_slug }}">{{ photo_tag }}</a></li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                        <p class="gallery-original-link"><a href="{{ photo.image | relative_url }}">Open original image</a></p>
+                      </div>
+                    </div>
+                  </section>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endfor -%}
+          </div>
+        </section>
+      {%- endunless -%}
+    {%- endfor -%}
+  </div>
+  </div>
+{%- endif -%}

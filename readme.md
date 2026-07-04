@@ -183,6 +183,14 @@ Clicking a gallery thumbnail opens an in-page photo viewer at a fragment URL suc
 
 The viewer includes previous and next links, a close link back to the thumbnail grid, captions, tags, and a direct link to open the original image file.
 
+Album and photo tags link to the generated tag gallery page:
+
+```text
+/gallery/tags/#tag-wildlife
+```
+
+Each tag section lists matching albums and photos with that tag. Photo-level tags include only explicitly tagged photos; album-level tags include every photo from matching albums. The tag page hides result sections until a tag fragment is selected, such as `/gallery/tags/#tag-wildlife`. Opening a photo from a tag section uses a tag-specific viewer, so previous and next navigation stays within that tag result set rather than returning to the source album.
+
 ## Styling
 
 Main Sass entry point:

@@ -33,7 +33,8 @@
             {%- if photo.tags -%}
               <ul class="gallery-tag-list gallery-photo-tags" aria-label="Photo tags">
                 {%- for tag in photo.tags -%}
-                  <li>{{ tag }}</li>
+                  {%- assign tag_slug = tag | append: "" | slugify -%}
+                  <li><a href="{{ '/gallery/tags/' | relative_url }}#tag-{{ tag_slug }}">{{ tag }}</a></li>
                 {%- endfor -%}
               </ul>
             {%- endif -%}

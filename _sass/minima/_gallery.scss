@@ -110,9 +110,116 @@
     border-radius: 999px;
     padding: 2px 8px;
   }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:visited {
+      color: inherit;
+    }
+
+    &:hover,
+    &:focus {
+      color: inherit;
+      text-decoration: underline;
+    }
+  }
 }
 
 .gallery-photo-tags {
+  margin-top: $spacing-unit / 3;
+}
+
+.gallery-tag-index {
+  margin: $spacing-unit 0;
+}
+
+.gallery-tag-empty-state {
+  color: $grey-color-dark;
+  border: 1px dashed $grey-color-light;
+  padding: $spacing-unit / 2;
+}
+
+.gallery-tag-browser:has(.gallery-tag-section:target) .gallery-tag-empty-state,
+.gallery-tag-browser:has(.gallery-viewer:target) .gallery-tag-empty-state {
+  display: none;
+}
+
+.gallery-tag-sections {
+  display: grid;
+  gap: $spacing-unit * 1.5;
+}
+
+.gallery-tag-section {
+  display: none;
+  scroll-margin-top: $spacing-unit;
+}
+
+.gallery-tag-section:target,
+.gallery-tag-section:has(.gallery-viewer:target) {
+  display: block;
+}
+
+.gallery-tag-header {
+  border-top: 1px solid $grey-color-light;
+  padding-top: $spacing-unit / 2;
+  margin-bottom: $spacing-unit / 2;
+
+  h2 {
+    margin-bottom: $spacing-unit / 6;
+  }
+
+  p {
+    color: $grey-color;
+  }
+}
+
+.gallery-tag-albums {
+  display: grid;
+  gap: $spacing-unit / 2;
+  margin-bottom: $spacing-unit;
+}
+
+.gallery-tag-album-card {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: $spacing-unit / 2;
+  align-items: center;
+  border: 1px solid $grey-color-light;
+  background: #fff;
+  padding: $spacing-unit / 3;
+
+  h3 {
+    @include relative-font-size(1);
+    margin-bottom: $spacing-unit / 6;
+  }
+
+  p {
+    @include relative-font-size(0.875);
+    color: $grey-color-dark;
+    margin-bottom: 0;
+  }
+}
+
+.gallery-tag-album-cover {
+  display: block;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: $grey-color-light;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.gallery-source-album {
+  @include relative-font-size(0.875);
+  display: block;
+  color: $grey-color;
   margin-top: $spacing-unit / 3;
 }
 
@@ -207,6 +314,12 @@
     color: #fff;
     background: rgba(255, 255, 255, 0.18);
   }
+
+  .gallery-source-album,
+  .gallery-source-album a,
+  .gallery-source-album a:visited {
+    color: $grey-color-light;
+  }
 }
 
 .gallery-viewer-count,
@@ -245,5 +358,9 @@
   .gallery-viewer-next {
     grid-row: 2;
     justify-self: stretch;
+  }
+
+  .gallery-tag-album-card {
+    grid-template-columns: 72px 1fr;
   }
 }

@@ -31,7 +31,7 @@ mastodon:
 author: Scriptmonkey_
 logo: /assets/logo-50px.png
 rss: RSS Feed
-# Constrain excerpts to the first paragraph so markdown links stay intact.
+# Blog cards use the first rendered paragraph in _includes/feed.html.
 excerpt_separator: "\n\n"
 # Build settings
 # Removed minima theme as it is now a regular theme.
