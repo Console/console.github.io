@@ -1,0 +1,28 @@
+{%- assign photos = include.photos -%}
+{%- if photos -%}
+  <div class="gallery-grid">
+    {%- for photo in photos -%}
+      {%- assign caption = photo.caption | default: "" -%}
+      {%- assign alt = photo.alt | default: caption | default: page.title -%}
+      <figure class="gallery-item">
+        <a href="{{ photo.image | relative_url }}" class="gallery-image-link">
+          <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}" loading="lazy">
+        </a>
+        {%- if caption or photo.tags -%}
+          <figcaption>
+            {%- if caption -%}
+              <span class="gallery-caption">{{ caption }}</span>
+            {%- endif -%}
+            {%- if photo.tags -%}
+              <ul class="gallery-tag-list gallery-photo-tags" aria-label="Photo tags">
+                {%- for tag in photo.tags -%}
+                  <li>{{ tag }}</li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </figcaption>
+        {%- endif -%}
+      </figure>
+    {%- endfor -%}
+  </div>
+{%- endif -%}

@@ -1,0 +1,125 @@
+.gallery-album-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: $spacing-unit;
+  margin-top: $spacing-unit;
+}
+
+.gallery-album-card {
+  border: 1px solid $grey-color-light;
+  background: #fff;
+}
+
+.gallery-album-cover {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: $grey-color-light;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.gallery-album-summary {
+  padding: $spacing-unit / 2;
+
+  h2 {
+    @include relative-font-size(1.25);
+    margin-bottom: $spacing-unit / 3;
+  }
+
+  p {
+    color: $grey-color-dark;
+  }
+}
+
+.gallery-header {
+  margin-bottom: $spacing-unit / 2;
+}
+
+.gallery-back-link {
+  @include relative-font-size(0.875);
+  margin-bottom: $spacing-unit / 3;
+}
+
+.gallery-description {
+  color: $grey-color-dark;
+  margin-bottom: $spacing-unit / 2;
+}
+
+.gallery-intro {
+  margin-bottom: $spacing-unit;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: $spacing-unit;
+}
+
+.gallery-item {
+  margin: 0;
+  border: 1px solid $grey-color-light;
+  background: #fff;
+}
+
+.gallery-image-link {
+  display: block;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: $grey-color-light;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 160ms ease-in-out;
+  }
+
+  &:hover img,
+  &:focus img {
+    transform: scale(1.03);
+  }
+}
+
+.gallery-item figcaption {
+  padding: $spacing-unit / 2;
+}
+
+.gallery-caption {
+  display: block;
+  color: $text-color;
+}
+
+.gallery-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+
+  li {
+    @include relative-font-size(0.75);
+    color: $grey-color-dark;
+    background: $grey-color-light;
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+}
+
+.gallery-photo-tags {
+  margin-top: $spacing-unit / 3;
+}
+
+@include media-query($on-palm) {
+  .gallery-album-list,
+  .gallery-grid {
+    grid-template-columns: 1fr;
+    gap: $spacing-unit / 2;
+  }
+}

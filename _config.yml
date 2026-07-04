@@ -38,6 +38,11 @@ excerpt_separator: "\n\n"
 # theme: minima
 plugins:
   - jekyll-feed
+
+collections:
+  galleries:
+    output: true
+    permalink: /gallery/:name/
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to

@@ -1,0 +1,25 @@
+---
+layout: default
+---
+<article class="post gallery-page">
+  <header class="post-header gallery-header">
+    <p class="gallery-back-link"><a href="{{ '/gallery/' | relative_url }}">Back to gallery</a></p>
+    <h1 class="post-title">{{ page.title | escape }}</h1>
+    {%- if page.description -%}
+      <p class="gallery-description">{{ page.description | escape }}</p>
+    {%- endif -%}
+    {%- if page.tags -%}
+      <ul class="gallery-tag-list" aria-label="Gallery tags">
+        {%- for tag in page.tags -%}
+          <li>{{ tag }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </header>
+
+  <div class="post-content gallery-intro">
+    {{ content }}
+  </div>
+
+  {% include gallery-grid.html photos=page.photos %}
+</article>
