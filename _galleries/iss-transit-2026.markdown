@@ -1,6 +1,7 @@
 ---
 layout: gallery
 title: ISS Transit June 2026
+date: 2026-06-13 12:00:00 +0000
 description: Just some output from my efforts in attempting to capture the ISS as it flew across the sun in 0.8 seconds, on one sunny day in June.
 cover: /assets/gallery/iss-transit-june-2026/iss-transit-stacked.png
 tags:

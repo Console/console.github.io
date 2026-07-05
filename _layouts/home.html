@@ -1,4 +1,139 @@
 ---
-layout: none
+layout: default
 ---
-{{ site.posts.first }}
+{%- assign latest_post = site.posts.first -%}
+{%- assign galleries = site.galleries | sort: 'date' | reverse -%}
+{%- assign latest_gallery = galleries.first -%}
+
+<div class="home-landing">
+  <section class="home-intro">
+    <span class="home-intro-kicker">Field Notes</span>
+    <h1>Photography, experiments, and occasional security writing.</h1>
+    <p>Recent galleries and blog posts from the site.</p>
+    <div class="home-actions">
+      <a class="home-action-link" href="{{ '/gallery/' | relative_url }}">Browse Gallery</a>
+      <a class="home-action-link" href="{{ '/blog/' | relative_url }}">Read Blog</a>
+    </div>
+  </section>
+
+  <section class="home-section">
+    <div class="home-section-heading">
+      <h2>Latest Additions</h2>
+    </div>
+    <div class="home-featured-grid">
+      {%- if latest_gallery -%}
+        <article class="home-card home-card-featured home-card-gallery-featured">
+          {%- assign gallery_cover = latest_gallery.cover | default: latest_gallery.photos.first.image -%}
+          {%- if gallery_cover -%}
+            <a href="{{ latest_gallery.url | relative_url }}" class="home-card-image-link">
+              <img src="{{ gallery_cover | relative_url }}" alt="{{ latest_gallery.title | escape }}" class="featured-image">
+            </a>
+          {%- endif -%}
+          <div class="card-content">
+            <div class="card-title">
+              <span class="home-card-kicker">Latest Gallery</span>
+              <a href="{{ latest_gallery.url | relative_url }}" class="post-link">{{ latest_gallery.title | escape }}</a>
+            </div>
+            <div class="card-excerpt">
+              <p>{{ latest_gallery.description | default: latest_gallery.content | strip_html | normalize_whitespace | truncate: 180 }}</p>
+            </div>
+            <div class="card-date">
+              <span class="date">{{ latest_gallery.date | date: "%Y/%m/%d" }}</span>
+              <a href="{{ latest_gallery.url | relative_url }}" class="home-card-cta">View gallery</a>
+            </div>
+          </div>
+        </article>
+      {%- endif -%}
+
+      {%- if latest_post -%}
+        <article class="home-card home-card-featured home-card-post-featured">
+          {%- assign post_image = latest_post.image | relative_url -%}
+          {%- if post_image -%}
+            <a href="{{ latest_post.url | relative_url }}" class="home-card-image-link">
+              <img src="{{ post_image }}" alt="" class="featured-image">
+            </a>
+          {%- endif -%}
+          <div class="card-content">
+            <div class="card-title">
+              <span class="home-card-kicker">Latest Post</span>
+              <a href="{{ latest_post.url | relative_url }}" class="post-link">{{ latest_post.title | escape }}</a>
+            </div>
+            <div class="card-excerpt">
+              {%- assign summary_parts = latest_post.content | split: '<p>' -%}
+              {%- assign summary_paragraph = summary_parts[1] | split: '</p>' | first -%}
+              <p>{{ summary_paragraph }}</p>
+            </div>
+            <div class="card-date">
+              <span class="date">{{ latest_post.date | date: "%Y/%m/%d" }}</span>
+              <a href="{{ latest_post.url | relative_url }}" class="home-card-cta">Read post</a>
+            </div>
+          </div>
+        </article>
+      {%- endif -%}
+    </div>
+  </section>
+
+  <section class="home-section">
+    <div class="home-section-heading">
+      <span class="home-section-kicker">Photography</span>
+      <h2>Recent Gallery</h2>
+      <a href="{{ '/gallery/' | relative_url }}">View all gallery</a>
+    </div>
+    <div class="home-recent-grid">
+      {%- for gallery in galleries offset: 1 limit: 3 -%}
+        <article class="home-card home-card-compact">
+          {%- assign gallery_cover = gallery.cover | default: gallery.photos.first.image -%}
+          {%- if gallery_cover -%}
+            <a href="{{ gallery.url | relative_url }}" class="home-card-image-link">
+              <img src="{{ gallery_cover | relative_url }}" alt="{{ gallery.title | escape }}" class="featured-image">
+            </a>
+          {%- endif -%}
+          <div class="card-content">
+            <div class="card-title">
+              <a href="{{ gallery.url | relative_url }}" class="post-link">{{ gallery.title | escape }}</a>
+            </div>
+            <div class="card-excerpt">
+              <p>{{ gallery.description | default: gallery.content | strip_html | normalize_whitespace | truncate: 140 }}</p>
+            </div>
+            <div class="card-date">
+              <span class="date">{{ gallery.date | date: "%Y/%m/%d" }}</span>
+            </div>
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </section>
+
+  <section class="home-section">
+    <div class="home-section-heading">
+      <span class="home-section-kicker">Writing</span>
+      <h2>Recent Writing</h2>
+      <a href="{{ '/blog/' | relative_url }}">View all posts</a>
+    </div>
+    <div class="home-recent-grid">
+      {%- for post in site.posts offset: 1 limit: 3 -%}
+        <article class="home-card home-card-compact">
+          {%- assign post_image = post.image | relative_url -%}
+          {%- if post_image -%}
+            <a href="{{ post.url | relative_url }}" class="home-card-image-link">
+              <img src="{{ post_image }}" alt="" class="featured-image">
+            </a>
+          {%- endif -%}
+          <div class="card-content">
+            <div class="card-title">
+              <a href="{{ post.url | relative_url }}" class="post-link">{{ post.title | escape }}</a>
+            </div>
+            <div class="card-excerpt">
+              {%- assign summary_parts = post.content | split: '<p>' -%}
+              {%- assign summary_paragraph = summary_parts[1] | split: '</p>' | first -%}
+              <p>{{ summary_paragraph }}</p>
+            </div>
+            <div class="card-date">
+              <span class="date">{{ post.date | date: "%Y/%m/%d" }}</span>
+            </div>
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </section>
+</div>

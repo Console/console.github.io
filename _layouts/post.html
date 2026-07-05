@@ -1,31 +1,36 @@
 ---
 layout: default
 ---
-<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+<article class="post post-entry h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <header class="post-header">
+  <header class="post-header post-entry-header">
+    <p class="post-entry-back-link"><a href="{{ '/blog/' | relative_url }}">Back to blog</a></p>
+    <span class="page-header-kicker">Writing</span>
+    <div class="post-entry-heading">
+      <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
+      <p class="post-meta">
+        <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+          {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+          {{ page.date | date: date_format }}
+        </time>
+        {%- if page.author -%}
+          • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ page.author }}</span></span>
+        {%- endif -%}
+      </p>
+    </div>
     {%- if page.image -%}
-      <img src="{{- page.image | relative_url -}}" alt="" class="featured-image-post">
+      <img src="{{- page.image | relative_url -}}" alt="" class="featured-image-post post-entry-image">
     {%- else -%}
       {% assign placeholder_image_file = site.static_files
         | where_exp: "file", "file.name contains 'placeholder_hack'"
-        | sample
+      | sample
       %}
       {%- assign postImage = placeholder_image_file.path -%}
-      <img src="{{- postImage | relative_url -}}" alt="" class="featured-image-post">
+      <img src="{{- postImage | relative_url -}}" alt="" class="featured-image-post post-entry-image">
     {%- endif -%}
-    <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
-        {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
-        {{ page.date | date: date_format }}
-      </time>
-      {%- if page.author -%}
-        • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ page.author }}</span></span>
-      {%- endif -%}</p>
   </header>
 
-  <div class="post-content e-content" itemprop="articleBody">
+  <div class="post-content post-entry-content e-content" itemprop="articleBody">
     {{ content }}
   </div>
 

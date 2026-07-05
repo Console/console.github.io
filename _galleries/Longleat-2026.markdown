@@ -1,6 +1,7 @@
 ---
 layout: gallery
 title: Longleat 2026
+date: 2026-06-26 12:00:00 +0000
 description: A selection of photos from a visit to Longleat in 2026.
 cover: /assets/gallery/longleat-2026/DSCF2204-The_House.jpg
 tags:

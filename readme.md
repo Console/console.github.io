@@ -11,11 +11,125 @@ The site contains blog posts, static pages, AI game pages, CTF content, and a Ma
 - `_layouts/` - Page, post, and gallery layouts.
 - `_includes/` - Shared HTML snippets.
 - `_sass/minima/` - Site styles.
+- `_includes/header.html` - Curated primary navigation and mobile menu markup.
 - `assets/images/` - Existing blog and shared images.
 - `assets/gallery/` - Gallery album images.
+- `index.markdown` + `_layouts/home.html` - Homepage content and landing-page layout.
 - `gallery.markdown` - Gallery landing page.
+- `gallery-tags.markdown` - Gallery tag landing page.
 - `blog.markdown` - Blog listing page.
 - `.github/workflows/jekyll.yml` - GitHub Pages build and deploy workflow.
+
+## Navigation
+
+The primary header navigation is manually curated in:
+
+```text
+_includes/header.html
+```
+
+It is no longer generated automatically from all titled pages.
+
+Current top-level structure:
+
+1. `Gallery`
+2. `Blog`
+3. `Projects & Talks`
+4. `About`
+
+Current child links:
+
+1. `Gallery`
+   - `Browse Gallery`
+   - `Gallery Tags`
+2. `Projects & Talks`
+   - `AI-Games`
+
+Active states are also handled in `_includes/header.html` by checking `page.url` and setting booleans for each top-level section.
+
+### Add A New Top-Level Link
+
+Edit `_includes/header.html` and add another `li.site-nav-item` inside:
+
+```html
+<ul class="site-nav-list">
+```
+
+Example:
+
+```html
+<li class="site-nav-item{% if new_section_active %} is-active{% endif %}">
+  <a class="page-link" href="{{ '/new-section/' | relative_url }}">New Section</a>
+</li>
+```
+
+If the new section needs an active state, also add a boolean near the top of the file alongside `gallery_active`, `blog_active`, and the others.
+
+Example:
+
+```liquid
+{%- assign new_section_active = false -%}
+{%- if current_url == '/new-section/' or current_url contains '/new-section/' -%}
+  {%- assign new_section_active = true -%}
+{%- endif -%}
+```
+
+### Add A Child Link Under An Existing Section
+
+Child links live inside the nested:
+
+```html
+<ul class="site-subnav-list">
+```
+
+Example under `Gallery`:
+
+```html
+<ul class="site-subnav-list">
+  <li><a class="page-link site-subnav-link" href="{{ '/gallery/' | relative_url }}">Browse Gallery</a></li>
+  <li><a class="page-link site-subnav-link" href="{{ '/gallery/tags/' | relative_url }}">Gallery Tags</a></li>
+  <li><a class="page-link site-subnav-link" href="{{ '/gallery/favourites/' | relative_url }}">Favourites</a></li>
+</ul>
+```
+
+### Add A New Parent Section With Children
+
+Use the `site-nav-item-parent` class on the top-level `li` and add a nested `site-subnav-list`.
+
+Example:
+
+```html
+<li class="site-nav-item site-nav-item-parent{% if notes_active %} is-active{% endif %}">
+  <a class="page-link" href="{{ '/notes/' | relative_url }}">Notes</a>
+  <ul class="site-subnav-list">
+    <li><a class="page-link site-subnav-link" href="{{ '/notes/' | relative_url }}">All Notes</a></li>
+    <li><a class="page-link site-subnav-link" href="{{ '/notes/archive/' | relative_url }}">Archive</a></li>
+  </ul>
+</li>
+```
+
+Desktop behavior uses hover/focus dropdowns. Mobile behavior shows child links inline inside the opened menu panel.
+
+## Homepage
+
+The homepage uses a custom landing-page layout in:
+
+```text
+_layouts/home.html
+```
+
+It is intentionally curated rather than showing the full latest blog post.
+
+Current homepage sections:
+
+1. `Field Notes` intro panel
+2. `Latest Additions`
+   - latest gallery by gallery `date`
+   - latest blog post by post date
+3. `Recent Gallery`
+4. `Recent Writing`
+
+The homepage relies on gallery items having a `date:` field in front matter so the latest gallery can be determined reliably.
 
 ## Local Requirements
 
@@ -137,6 +251,7 @@ Example album front matter:
 ---
 layout: gallery
 title: Conference 2026
+date: 2026-06-01 12:00:00 +0000
 description: A short description of the album.
 cover: /assets/gallery/conference-2026/stage.jpg
 tags:
@@ -153,6 +268,8 @@ photos:
 ```
 
 The body of the Markdown file can contain normal album intro text.
+
+`date:` is used by the homepage and the gallery landing page for reverse-chronological ordering.
 
 Album URLs are generated from `_config.yml`:
 
@@ -210,6 +327,28 @@ Feed/blog-card styles:
 ```text
 _sass/minima/_feed.scss
 ```
+
+Layout and header styles:
+
+```text
+_sass/minima/_layout.scss
+```
+
+Current styling split:
+
+1. `_layout.scss`
+   - header and navigation
+   - page wrapper and article/post layout
+   - single-post reading layout
+2. `_feed.scss`
+   - homepage layout
+   - page intro panels
+   - blog listing cards
+3. `_gallery.scss`
+   - gallery landing page
+   - individual gallery pages
+   - gallery tag page
+   - gallery viewer and shared gallery tile styling
 
 ## Deployment
 

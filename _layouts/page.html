@@ -4,6 +4,9 @@ layout: default
 <article class="post">
 
   <header class="post-header">
+    {%- if page.kicker -%}
+      <span class="page-header-kicker">{{ page.kicker }}</span>
+    {%- endif -%}
     <h1 class="post-title">{{ page.title | escape }}</h1>
   </header>
 
@@ -14,20 +17,30 @@ layout: default
 
 {%- assign feedType = page.feed-type -%}
 {%- if feedType == "blog" -%}
-<h2>Most Recent Post</h2>
+<section class="listing-section listing-section-blog">
+  <div class="listing-section-heading">
+    <span class="listing-section-kicker">Latest Writing</span>
+    <h2>Most Recent Post</h2>
+  </div>
   {%- assign displayOffset = 0 -%}
   {%- assign displayLimit = 1 -%}
   {%- assign sectionName = "featured-post" -%}
   {% include feed.html %}
+  </section>
 {%- endif -%}
 
 {%- assign feedType = page.feed-type -%}
 {%- if feedType == "blog" -%}
-  <h2>Previous Posts</h2>
+  <section class="listing-section listing-section-blog">
+  <div class="listing-section-heading">
+    <span class="listing-section-kicker">Archive</span>
+    <h2>Previous Posts</h2>
+  </div>
   {%- assign displayOffset = 1 -%}
   {%- assign displayLimit = null -%}
   {%- assign sectionName = "feed" -%}
   {% include feed.html %}
+  </section>
 {%- endif -%}
 
 

@@ -2,23 +2,27 @@
 layout: default
 ---
 <article class="post gallery-page">
-  <header class="post-header gallery-header">
+  <header class="post-header gallery-header gallery-page-header">
     <p class="gallery-back-link"><a href="{{ '/gallery/' | relative_url }}">Back to gallery</a></p>
-    <h1 class="post-title">{{ page.title | escape }}</h1>
-    {%- if page.description -%}
-      <p class="gallery-description">{{ page.description | escape }}</p>
-    {%- endif -%}
-    {%- if page.tags -%}
-      <ul class="gallery-tag-list" aria-label="Gallery tags">
-        {%- for tag in page.tags -%}
-          {%- assign tag_slug = tag | append: "" | slugify -%}
-          <li><a href="{{ '/gallery/tags/' | relative_url }}#tag-{{ tag_slug }}">{{ tag }}</a></li>
-        {%- endfor -%}
-      </ul>
-    {%- endif -%}
+    <div class="gallery-page-intro page-intro page-intro-gallery-detail">
+      <span class="page-header-kicker">Photography</span>
+      <h1 class="post-title">{{ page.title | escape }}</h1>
+      <p class="gallery-album-date">{{ page.date | date: "%Y/%m/%d" }}</p>
+      {%- if page.description -%}
+        <p class="gallery-description page-intro-lead">{{ page.description | escape }}</p>
+      {%- endif -%}
+      {%- if page.tags -%}
+        <ul class="gallery-tag-list" aria-label="Gallery tags">
+          {%- for tag in page.tags -%}
+            {%- assign tag_slug = tag | append: "" | slugify -%}
+            <li><a href="{{ '/gallery/tags/' | relative_url }}#tag-{{ tag_slug }}">{{ tag }}</a></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
   </header>
 
-  <div class="post-content gallery-intro">
+  <div class="post-content gallery-intro gallery-page-content">
     {{ content }}
   </div>
 

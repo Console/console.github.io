@@ -2,12 +2,14 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: $spacing-unit;
-  margin-top: $spacing-unit;
 }
 
 .gallery-album-card {
-  border: 1px solid $grey-color-light;
-  background: #fff;
+  border: 1px solid #e1ddd5;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fffdf9;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
 }
 
 .gallery-album-cover {
@@ -21,38 +23,69 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 180ms ease;
+  }
+
+  &:hover img,
+  &:focus img {
+    transform: scale(1.03);
   }
 }
 
 .gallery-album-summary {
-  padding: $spacing-unit / 2;
+  display: grid;
+  gap: 10px;
+  padding: 18px;
 
   h2 {
     @include relative-font-size(1.25);
-    margin-bottom: $spacing-unit / 3;
+    margin-bottom: 0;
   }
 
   p {
-    color: $grey-color-dark;
+    color: #4d4538;
+    margin-bottom: 0;
   }
+}
+
+.gallery-album-date {
+  @include relative-font-size(0.75);
+  color: #7b735f;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .gallery-header {
   margin-bottom: $spacing-unit / 2;
 }
 
-.gallery-back-link {
-  @include relative-font-size(0.875);
-  margin-bottom: $spacing-unit / 3;
+.gallery-page-header {
+  display: grid;
+  gap: 14px;
+}
+
+.gallery-page-intro {
+  margin-bottom: 0;
 }
 
 .gallery-description {
   color: $grey-color-dark;
-  margin-bottom: $spacing-unit / 2;
+  margin-bottom: 0;
 }
 
 .gallery-intro {
   margin-bottom: $spacing-unit;
+}
+
+.gallery-page-content {
+  max-width: 70ch;
+  color: #2d2a25;
+}
+
+.gallery-tag-browser {
+  display: grid;
+  gap: 24px;
 }
 
 .gallery-grid {
@@ -63,13 +96,16 @@
 
 .gallery-item {
   margin: 0;
-  border: 1px solid $grey-color-light;
-  background: #fff;
+  border: 1px solid #e1ddd5;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fffdf9;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
 }
 
 .gallery-image-link {
   display: block;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: $grey-color-light;
 
@@ -88,7 +124,7 @@
 }
 
 .gallery-item figcaption {
-  padding: $spacing-unit / 2;
+  padding: 18px;
 }
 
 .gallery-caption {
@@ -105,10 +141,10 @@
 
   li {
     @include relative-font-size(0.75);
-    color: $grey-color-dark;
-    background: $grey-color-light;
+    color: #5d564a;
+    background: #f1ece3;
     border-radius: 999px;
-    padding: 2px 8px;
+    padding: 4px 10px;
   }
 
   a {
@@ -132,13 +168,20 @@
 }
 
 .gallery-tag-index {
-  margin: $spacing-unit 0;
+  margin: 0;
+  padding: 18px;
+  border: 1px solid #e1ddd5;
+  border-radius: 18px;
+  background: #fffdf9;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
 }
 
 .gallery-tag-empty-state {
-  color: $grey-color-dark;
-  border: 1px dashed $grey-color-light;
-  padding: $spacing-unit / 2;
+  color: #5d564a;
+  border: 1px dashed #d7d1c5;
+  border-radius: 18px;
+  padding: 18px;
+  background: #fbf8f2;
 }
 
 .gallery-tag-browser:has(.gallery-tag-section:target) .gallery-tag-empty-state,
@@ -154,6 +197,11 @@
 .gallery-tag-section {
   display: none;
   scroll-margin-top: $spacing-unit;
+  border: 1px solid #e1ddd5;
+  border-radius: 22px;
+  background: #fffdf9;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+  padding-bottom: 24px;
 }
 
 .gallery-tag-section:target,
@@ -162,16 +210,18 @@
 }
 
 .gallery-tag-header {
-  border-top: 1px solid $grey-color-light;
-  padding-top: $spacing-unit / 2;
-  margin-bottom: $spacing-unit / 2;
+  display: grid;
+  gap: 8px;
+  padding: 22px 24px 0;
+  margin-bottom: 0;
 
   h2 {
-    margin-bottom: $spacing-unit / 6;
+    margin-bottom: 0;
   }
 
   p {
-    color: $grey-color;
+    color: #5d564a;
+    margin-bottom: 0;
   }
 }
 
@@ -179,6 +229,7 @@
   display: grid;
   gap: $spacing-unit / 2;
   margin-bottom: $spacing-unit;
+  padding: 0 24px;
 }
 
 .gallery-tag-album-card {
@@ -186,9 +237,11 @@
   grid-template-columns: 96px 1fr;
   gap: $spacing-unit / 2;
   align-items: center;
-  border: 1px solid $grey-color-light;
-  background: #fff;
-  padding: $spacing-unit / 3;
+  border: 1px solid #e1ddd5;
+  border-radius: 16px;
+  background: #fffdf9;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+  padding: 12px;
 
   h3 {
     @include relative-font-size(1);
@@ -334,6 +387,16 @@
   .gallery-grid {
     grid-template-columns: 1fr;
     gap: $spacing-unit / 2;
+  }
+
+  .gallery-page-content {
+    max-width: 100%;
+  }
+
+  .gallery-tag-header,
+  .gallery-tag-albums {
+    padding-left: 18px;
+    padding-right: 18px;
   }
 
   .gallery-viewer:target {
