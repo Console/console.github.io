@@ -33,6 +33,9 @@ photos:
       - dwarf3
       - transit
       - solar
+  - video: /assets/gallery/iss-transit-june-2026/iss-solar-transit.mp4
+    caption: A video of the ISS transiting the sun's disc.
+    alt: A video of the ISS transiting the sun.
 ---
 
 An off the cuff attempt at capturing the ISS as it transited the sun one day in June. I used a Dwarf 3 smart telescope to take a 4k video of the transit at 30 frames per second. Loaded the subsequent video into PIPP for conversion into a series of tiff files.

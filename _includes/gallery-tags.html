@@ -107,10 +107,28 @@
                 {%- if photo_matches_tag -%}
                   {%- assign match_index = match_index | plus: 1 -%}
                   {%- assign caption = photo.caption | default: "" -%}
+                  {%- assign is_video = false -%}
+                  {%- if photo.video -%}
+                    {%- assign is_video = true -%}
+                  {%- endif -%}
+                  {%- assign preview_image = photo.poster | default: photo.image -%}
+                  {%- if is_video and preview_image == nil -%}
+                    {%- assign preview_image = photo.video | replace: '.MP4', '-poster.jpg' | replace: '.mp4', '-poster.jpg' -%}
+                  {%- endif -%}
                   {%- assign alt = photo.alt | default: caption | default: gallery.title -%}
                   <figure class="gallery-item">
                     <a href="#tag-{{ tag_slug }}-photo-{{ match_index }}" class="gallery-image-link">
-                      <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}" loading="lazy">
+                      {%- if is_video -%}
+                        {%- if preview_image -%}
+                          <img src="{{ preview_image | relative_url }}" alt="{{ alt | escape }}" loading="lazy" class="gallery-media-preview gallery-media-poster" onerror="this.hidden=true; this.nextElementSibling.hidden=false;">
+                        {%- endif -%}
+                        <video class="gallery-media-preview gallery-media-fallback" preload="metadata" muted playsinline aria-label="{{ alt | escape }}"{% if preview_image %} hidden{% endif %}>
+                          <source src="{{ photo.video | relative_url }}" type="video/mp4">
+                        </video>
+                        <span class="gallery-media-badge">Video</span>
+                      {%- else -%}
+                        <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}" loading="lazy" class="gallery-media-preview">
+                      {%- endif -%}
                     </a>
                     <figcaption>
                       {%- if caption -%}
@@ -152,6 +170,14 @@
                 {%- if photo_matches_tag -%}
                   {%- assign match_index = match_index | plus: 1 -%}
                   {%- assign caption = photo.caption | default: "" -%}
+                  {%- assign is_video = false -%}
+                  {%- if photo.video -%}
+                    {%- assign is_video = true -%}
+                  {%- endif -%}
+                  {%- assign preview_image = photo.poster | default: photo.image -%}
+                  {%- if is_video and preview_image == nil -%}
+                    {%- assign preview_image = photo.video | replace: '.MP4', '-poster.jpg' | replace: '.mp4', '-poster.jpg' -%}
+                  {%- endif -%}
                   {%- assign alt = photo.alt | default: caption | default: gallery.title -%}
                   {%- if match_index == 1 -%}
                     {%- assign previous_index = match_count -%}
@@ -168,11 +194,18 @@
                       <a class="gallery-viewer-close" href="#tag-{{ tag_slug }}" aria-label="Close photo viewer">Close</a>
                       <div class="gallery-viewer-image-wrap">
                         <a class="gallery-viewer-nav gallery-viewer-prev" href="#tag-{{ tag_slug }}-photo-{{ previous_index }}" aria-label="Previous photo">Previous</a>
-                        <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}">
+                        {%- if is_video -%}
+                          <video class="gallery-viewer-media" controls preload="metadata" playsinline{% if preview_image %} poster="{{ preview_image | relative_url }}"{% endif %}>
+                            <source src="{{ photo.video | relative_url }}" type="video/mp4">
+                            <p>Your browser does not support MP4 playback. <a href="{{ photo.video | relative_url }}">Open the video directly</a>.</p>
+                          </video>
+                        {%- else -%}
+                          <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}" class="gallery-viewer-media">
+                        {%- endif -%}
                         <a class="gallery-viewer-nav gallery-viewer-next" href="#tag-{{ tag_slug }}-photo-{{ next_index }}" aria-label="Next photo">Next</a>
                       </div>
                       <div class="gallery-viewer-meta">
-                        <p class="gallery-viewer-count">{{ tag }} photo {{ match_index }} of {{ match_count }}</p>
+                        <p class="gallery-viewer-count">{{ tag }} {% if is_video %}video{% else %}photo{% endif %} {{ match_index }} of {{ match_count }}</p>
                         {%- if caption -%}
                           <p class="gallery-caption" id="tag-{{ tag_slug }}-photo-{{ match_index }}-caption">{{ caption }}</p>
                         {%- else -%}
@@ -187,7 +220,7 @@
                             {%- endfor -%}
                           </ul>
                         {%- endif -%}
-                        <p class="gallery-original-link"><a href="{{ photo.image | relative_url }}">Open original image</a></p>
+                        <p class="gallery-original-link"><a href="{{ photo.video | default: photo.image | relative_url }}">Open original {% if is_video %}video{% else %}image{% endif %}</a></p>
                       </div>
                     </div>
                   </section>

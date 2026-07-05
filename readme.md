@@ -161,7 +161,7 @@ eval "$(rbenv init - bash)"
 ## Build The Site
 
 ```bash
-eval "$(rbenv init - bash)" && bundle exec jekyll build
+eval "$(rbenv init - bash)" && ruby scripts/generate_gallery_posters.rb && bundle exec jekyll build
 ```
 
 The generated site is written to `_site/`.
@@ -169,7 +169,7 @@ The generated site is written to `_site/`.
 ## Preview Locally
 
 ```bash
-eval "$(rbenv init - bash)" && bundle exec jekyll serve
+eval "$(rbenv init - bash)" && ruby scripts/generate_gallery_posters.rb && bundle exec jekyll serve
 ```
 
 Then open:
@@ -181,14 +181,16 @@ http://127.0.0.1:4000/
 For WSL, if the browser cannot reach the site, run:
 
 ```bash
-eval "$(rbenv init - bash)" && bundle exec jekyll serve --host 0.0.0.0
+eval "$(rbenv init - bash)" && ruby scripts/generate_gallery_posters.rb && bundle exec jekyll serve --host 0.0.0.0
 ```
 
 If file watching is unreliable under WSL:
 
 ```bash
-eval "$(rbenv init - bash)" && bundle exec jekyll serve --no-watch
+eval "$(rbenv init - bash)" && ruby scripts/generate_gallery_posters.rb && bundle exec jekyll serve --no-watch
 ```
+
+The poster-generation step requires `ffmpeg` to be available locally.
 
 ## Blog Posts
 
@@ -264,12 +266,53 @@ photos:
     tags:
       - stage
       - conference
+  - video: /assets/gallery/conference-2026/walkthrough.mp4
+    poster: /assets/gallery/conference-2026/walkthrough-poster.jpg
+    caption: A short walkthrough clip.
+    alt: Short walkthrough video
+    tags:
+      - conference
+      - video
 ---
 ```
 
 The body of the Markdown file can contain normal album intro text.
 
 `date:` is used by the homepage and the gallery landing page for reverse-chronological ordering.
+
+Gallery entries can now contain either images or MP4 videos:
+
+1. Image item:
+
+```yaml
+- image: /assets/gallery/conference-2026/stage.jpg
+  caption: Presenting on stage.
+```
+
+2. Video item:
+
+```yaml
+- video: /assets/gallery/conference-2026/walkthrough.mp4
+  caption: A short walkthrough clip.
+```
+
+Video notes:
+
+1. Use `video:` for the MP4 file.
+2. `poster:` is optional. If omitted, the build script generates `*-poster.jpg` next to the video.
+3. If `poster:` is supplied explicitly, that file must exist and will be used as-is.
+4. The templates fall back to `image:` if you set one, otherwise to the inferred `*-poster.jpg` path.
+5. The build helper also transcodes gallery MP4s to a browser-safe H.264/AAC MP4 with `faststart` for more reliable playback.
+6. If a poster is temporarily missing during local preview, gallery grids fall back to an inline muted video preview instead of a broken image.
+7. Video items render as playable MP4s in the gallery viewer and on the gallery tags page.
+8. AVI is not supported by the gallery templates; convert source videos to MP4 before uploading.
+
+Automatic poster generation example:
+
+```text
+/assets/gallery/conference-2026/walkthrough.mp4
+-> /assets/gallery/conference-2026/walkthrough-poster.jpg
+```
 
 Album URLs are generated from `_config.yml`:
 

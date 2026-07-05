@@ -3,9 +3,12 @@ layout: page
 title: Gallery
 permalink: /gallery/
 kicker: Photography
+show-page-header: false
 ---
 
 <div class="page-intro page-intro-gallery">
+  <span class="page-header-kicker">Photography</span>
+  <h1 class="post-title">Gallery</h1>
   <p class="page-intro-lead">A collection of photographs I've taken through the years, from days out with the Fujifilm X100F to more patient astrophotography sessions.</p>
 
   <div class="page-intro-body">

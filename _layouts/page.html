@@ -3,12 +3,15 @@ layout: default
 ---
 <article class="post">
 
+  {%- assign show_page_header = page.show-page-header -%}
+  {%- if show_page_header != false -%}
   <header class="post-header">
     {%- if page.kicker -%}
       <span class="page-header-kicker">{{ page.kicker }}</span>
     {%- endif -%}
     <h1 class="post-title">{{ page.title | escape }}</h1>
   </header>
+  {%- endif -%}
 
   <div class="post-content">
     {{ content }}

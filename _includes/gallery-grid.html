@@ -3,10 +3,28 @@
   <div class="gallery-grid" id="gallery-grid">
     {%- for photo in photos -%}
       {%- assign caption = photo.caption | default: "" -%}
+      {%- assign is_video = false -%}
+      {%- if photo.video -%}
+        {%- assign is_video = true -%}
+      {%- endif -%}
+      {%- assign preview_image = photo.poster | default: photo.image -%}
+      {%- if is_video and preview_image == nil -%}
+        {%- assign preview_image = photo.video | replace: '.MP4', '-poster.jpg' | replace: '.mp4', '-poster.jpg' -%}
+      {%- endif -%}
       {%- assign alt = photo.alt | default: caption | default: page.title -%}
       <figure class="gallery-item">
         <a href="#photo-{{ forloop.index }}" class="gallery-image-link">
-          <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}" loading="lazy">
+          {%- if is_video -%}
+            {%- if preview_image -%}
+              <img src="{{ preview_image | relative_url }}" alt="{{ alt | escape }}" loading="lazy" class="gallery-media-preview gallery-media-poster" onerror="this.hidden=true; this.nextElementSibling.hidden=false;">
+            {%- endif -%}
+            <video class="gallery-media-preview gallery-media-fallback" preload="metadata" muted playsinline aria-label="{{ alt | escape }}"{% if preview_image %} hidden{% endif %}>
+              <source src="{{ photo.video | relative_url }}" type="video/mp4">
+            </video>
+            <span class="gallery-media-badge">Video</span>
+          {%- else -%}
+            <img src="{{ photo.image | relative_url }}" alt="{{ alt | escape }}" loading="lazy" class="gallery-media-preview">
+          {%- endif -%}
         </a>
         {%- if caption or photo.tags -%}
           <figcaption>
