@@ -264,6 +264,10 @@
   padding: 0 24px;
 }
 
+.gallery-tag-grid {
+  padding: 0 24px;
+}
+
 .gallery-tag-album-card {
   display: grid;
   grid-template-columns: 96px 1fr;
@@ -431,7 +435,8 @@
   }
 
   .gallery-tag-header,
-  .gallery-tag-albums {
+  .gallery-tag-albums,
+  .gallery-tag-grid {
     padding-left: 18px;
     padding-right: 18px;
   }
