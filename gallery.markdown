@@ -27,7 +27,7 @@ show-page-header: false
 <section class="listing-section">
   <div class="listing-section-heading">
     <span class="listing-section-kicker">Recent Albums</span>
-    <h2>Chronological gallery</h2>
+    <h2>Gallery Collection</h2>
     <a href="{{ '/gallery/tags/' | relative_url }}">View tags</a>
   </div>
 
